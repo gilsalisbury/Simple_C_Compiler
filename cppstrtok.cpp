@@ -55,7 +55,8 @@ void cpplines (FILE* pipe, char* filename) {
          bufptr = NULL;
          if (token == NULL) break; 
          const string* str = intern_stringset (token);
-         cout << str;
+         //  change this 
+         if(str == NULL) cout << "string string";
          //printf ("token %d.%d: [%s]\n",
          //        linenr, tokenct, token);
       }
@@ -67,29 +68,7 @@ int main (int argc, char** argv) {
    int c;
    set_execname (argv[0]);
    //cout << get_execname() << "\n";
-   /*((c = getopt(argc, argv, "D:@:ly") ) != -1) {
-      switch (c){
-         case '@': 
-            cout << optarg << "set DEBUGF to 1\n";
-            set_debugflags(optarg);
-            break;
-         case 'n':
-            cout << optarg << "switch case to something with n\n";
-            break;
-         case 'D':
-            //set_debugflags(argv[c]);
-            cout << optarg << "\n";
-            s =  """ #ifdef optarg \
-                  #undef optarg  \
-                  #else  \
-                  #define optarg 1 \
-                  #endif """;
-
-
-            cout << optarg << "pass an argument to cpp\n";
-            break;
-      }
-   }*/
+   
    DEBUGF('d', "this will actually print");
    for (int argi = 1; argi < 2; ++argi) {
       string s;
@@ -97,15 +76,24 @@ int main (int argc, char** argv) {
          switch (c){
             case '@': 
                //cout << optarg << "set DEBUGF to 1\n";
+
+               if (string(optarg) != "d") {
+                  errprintf ("usage: oc [-ly] [-@ flag...] [-D string] program.oc\n");
+                  errprintf ("error: invalid debug flag: -@%s\n", optarg);
+                  errprintf ("[-@ flag...] valid options are:\n\t-@d ~ enable debug printing\n" );
+                  
+                  exit(1);
+               }
                set_debugflags(optarg);
                break;
-            case 'n':
-               //cout << optarg << "switch case to something with n\n";
-               break;
-            case 'D':
-               //cout << optarg << "\n";
+            case 'D': 
                s = " -D" + string(optarg);
-               //cout << optarg << "pass an argument to cpp\n";
+               break;
+            case 'l': 
+               cout << "yy_flex_debug option flag enabled\n";
+               break;
+            case 'y': 
+               cout << "yydebug option flag enabled\n";
                break;
             default: 
                errprintf ("usage: oc [-ly] [-@ flag...] [-D string] program.oc\n");
@@ -120,6 +108,7 @@ int main (int argc, char** argv) {
       if (pipe == NULL) {
          //cout << "something happened";
          //syserrprintf (command.c_str());
+         errprintf("invalid file name\n");
       }else {
          //cout << "something that was suppose to happened\n";
          cpplines (pipe, filename);
