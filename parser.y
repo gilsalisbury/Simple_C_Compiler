@@ -7,11 +7,11 @@
 
 %}
 
-
+%debug
 %defines
 %error-verbose
 %token-table
-
+%verbose
 
 %token TOK_VOID TOK_BOOL TOK_CHAR TOK_INT TOK_STRING
 %token TOK_IF TOK_ELSE TOK_WHILE TOK_RETURN TOK_STRUCT

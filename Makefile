@@ -30,6 +30,7 @@ ALLSRC    = ${ETCSRC} ${YSOURCES} ${LSOURCES} ${HSOURCES} ${CSOURCES}
 TESTINS   = ${wildcard test?.in}
 LISTSRC   = ${ALLSRC} ${HYGEN}
 
+
 #
 # Definitions of the compiler and compilation options:
 #

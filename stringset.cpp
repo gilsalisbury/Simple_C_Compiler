@@ -7,7 +7,6 @@ using namespace std;
 #include "stringset.h"
 
 using stringset = unordered_set<string>;
-
 stringset set;
 
 const string* intern_stringset (const char* string) {
