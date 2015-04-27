@@ -1,0 +1,13 @@
+sometext!!!!stringset[   0]:    9631199822919835226: 0x14ce3b8->"foo"
+stringset[   1]:   11991729193843390806: 0x14ceac8->"here"
+                    1963669536318759765: 0x14ce8e8->"in"
+stringset[   4]:   12758894582682253878: 0x14cea28->"middle"
+                     294648667521616676: 0x14ce6d8->"defined"
+stringset[   6]:   12954739773548996726: 0x14ce988->"the"
+stringset[   7]:   14481510741918333043: 0x14ce368->"is"
+stringset[   9]:    5230600636815278074: 0x14ce778->"69"
+                   14849783028996024063: 0x14ce638->"not"
+stringset[  10]:    2259322979682049632: 0x14ce848->"something"
+load_factor = 0.909
+bucket_count = 11
+max_bucket_size = 2

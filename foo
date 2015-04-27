@@ -1,0 +1,6 @@
+#define x 69
+#ifdef foo
+foo is defined x
+#else
+foo is not defined x
+#endif

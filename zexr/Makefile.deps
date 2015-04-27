@@ -1,0 +1,9 @@
+# Makefile.deps created Sat Apr 18 21:41:41 PDT 2015 by make
+astree.o: astree.cc astree.h auxlib.h stringset.h lyutils.h yyparse.h
+emit.o: emit.cc astree.h auxlib.h emit.h lyutils.h yyparse.h
+lyutils.o: lyutils.cc lyutils.h astree.h auxlib.h yyparse.h
+auxlib.o: auxlib.cc auxlib.h
+stringset.o: stringset.cc stringset.h auxlib.h
+main.o: main.cc astree.h auxlib.h emit.h lyutils.h yyparse.h stringset.h
+yylex.o: yylex.cc auxlib.h lyutils.h astree.h yyparse.h
+yyparse.o: yyparse.cc lyutils.h astree.h auxlib.h yyparse.h
