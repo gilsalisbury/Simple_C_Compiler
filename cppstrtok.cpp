@@ -1,4 +1,4 @@
-// $Id: cppstrtok.cpp,v 1.7 2015-04-13 19:40:55-07 - - $
+// $Id: cppstrtok.cpp,v 1.3 2015-04-27 21:13:49-07 - - $
 // dsalisbu
 // 1224878
 
@@ -26,7 +26,8 @@ using namespace std;
 
 const string CPP = "/usr/bin/cpp";
 const size_t LINESIZE = 1024;
-
+extern int yy_flex_debug;
+extern FILE* tokenout;
 
 // Chomp the last character from a buffer if it is delim.
 void chomp (char* string, char delim) {
@@ -65,14 +66,15 @@ int main (int argc, char** argv) {
    tokfn = strfn + ".tok";
    strfn += ".str";
    DEBUGF('d', name.c_str());
-
+   yy_flex_debug = 0;
    // parse option with getopt(3)
    for (int argi = 1; argi < 2; ++argi) {
       string s;
       while((c = getopt(argc, argv, "D:@:ly") ) != -1) {
          switch (c){
             case '@': 
-               if ((string(optarg) != "d") && (string(optarg) != "f") && (string(optarg) != "a")) {
+               if ((string(optarg) != "d") && (string(optarg) != "f") 
+                                          && (string(optarg) != "a")) {
                   syserrprintf ("usage: oc [-ly] [-@ flag...] "
                      "[-D string] program.oc\n");
                   syserrprintf ("[-@ flag...] valid options "
@@ -85,10 +87,9 @@ int main (int argc, char** argv) {
                s = " -D" + string(optarg);
                break;
             case 'l': 
-               cout << "option unimplemented: yy_flex_debug\n";
+               yy_flex_debug = 1;
                break;
-            case 'y': 
-               cout << "option unimplemented: yydebug\n";
+            case 'y':
                break;
             default: 
                errprintf ("usage: oc [-ly] [-@ flag...] "

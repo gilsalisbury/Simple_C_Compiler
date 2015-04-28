@@ -9,7 +9,7 @@
 %}
 
 %option 8bit
-
+%option debug
 %option nodefault
 %option nounput
 %option noyywrap
@@ -23,8 +23,13 @@ LETTER          [A-Za-z_]
 DIGIT           [0-9]
 NUMBER			 ({DIGIT}*)
 IDENT           ({LETTER}({LETTER}|{DIGIT})*)
-CHRCON			 ('([^\\'\n]|\\[\\'"0nt])')
-STRLIT			 (\"([^\\"\n]|\\[\\'"0nt])*\")
+CHRCON			 ('([^\\'\n]|\\[\\'"0abfnrtv\?])')
+STRLIT			 (\"([^\\"\n]|\\[\\'"0abfnrtv\?])*\")
+BADCHR 			 \'[^ \n]*|[^ \n]*\'
+BADSTR 			 \"[^ \"\n]*|[^ \"\n]*\"
+BADIDENT			 {DIGIT}+{IDENT}
+
+
 
 %%
 
@@ -54,6 +59,10 @@ STRLIT			 (\"([^\\"\n]|\\[\\'"0nt])*\")
 {IDENT}			{ return yylval_token (TOK_IDENT);		}
 {CHRCON}			{ return yylval_token (TOK_CHARCON); 	}
 {STRLIT}			{ return yylval_token (TOK_STRINGCON); }
+{BADCHR}			{ lexer_badtoken (yytext);     			}
+{BADSTR}			{ lexer_badtoken (yytext);     			}
+{BADIDENT}		{ lexer_badtoken (yytext);     			}
+
 
 "="            { return yylval_token ('=');   			}
 "=="				{ return yylval_token (TOK_EQ);			}

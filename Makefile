@@ -29,6 +29,7 @@ REPORTS   = ${LREPORT} ${YREPORT} ${IREPORT}
 ALLSRC    = ${ETCSRC} ${YSOURCES} ${LSOURCES} ${HSOURCES} ${CSOURCES}
 TESTINS   = ${wildcard test?.in}
 LISTSRC   = ${ALLSRC} ${HYGEN}
+PATHES    = /afs/cats.ucsc.edu/courses/cmps104a-wm/bin/
 
 
 #
@@ -73,8 +74,9 @@ ${CYGEN} ${HYGEN} : ${YSOURCES}
 #
 # Check sources into an RCS subdirectory.
 #
-ci : ${ALLSRC} ${TESTINS}
-	cid + ${ALLSRC} ${TESTINS} test?.inh
+ci :
+		${PATHES}cid + ${ALLCSRC}
+		${PATHES}checksource ${ALLCSRC}
 
 #
 # Make a listing from all of the sources

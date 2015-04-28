@@ -38,7 +38,8 @@ astree* adopt2 (astree* root, astree* left, astree* right) {
 static void tok_dump_node (FILE* outfile, astree* node) {
    fprintf (outfile, "%4d%4d.%03d %4d %-16s (%s)",
             int(node->filenr), int(node->linenr), int(node->offset),
-            node->symbol, get_yytname(node->symbol), node->lexinfo->c_str());
+            node->symbol, get_yytname(node->symbol), 
+            node->lexinfo->c_str());
    bool need_space = false;
    for (size_t child = 0; child < node->children.size();
         ++child) {
@@ -132,5 +133,5 @@ void free_ast2 (astree* tree1, astree* tree2) {
    free_ast (tree2);
 }
 
-RCSC("$Id: astree.cpp,v 1.6 2015-04-09 19:31:47-07 - - $")
+RCSC("$Id: astree.cpp,v 1.2 2015-04-26 21:23:14-07 - - $")
 
