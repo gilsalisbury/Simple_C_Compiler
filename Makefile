@@ -1,5 +1,6 @@
 # $Id: Makefile,v 1.12 2015-04-16 17:17:22-07 - - $
-
+# dsalisbu
+# 1224878
 MKFILE    = Makefile
 DEPSFILE  = ${MKFILE}.deps
 NOINCLUDE = ci clean spotless
@@ -10,7 +11,8 @@ VALGRIND  = valgrind --leak-check=full --show-reachable=yes
 # Definitions of list of files:
 #
 HSOURCES  = astree.h lyutils.h auxlib.h  stringset.h
-CSOURCES  = astree.cpp lyutils.cpp auxlib.cpp stringset.cpp cppstrtok.cpp
+CSOURCES  = astree.cpp lyutils.cpp auxlib.cpp \
+			stringset.cpp cppstrtok.cpp
 LSOURCES  = scanner.l
 YSOURCES  = parser.y
 ETCSRC    = README ${MKFILE} ${DEPSFILE}

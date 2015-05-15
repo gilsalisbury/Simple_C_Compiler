@@ -1,3 +1,6 @@
+// dsalisbu
+// 1224878
+
 #ifndef __ASTREE_H__
 #define __ASTREE_H__
 
@@ -24,6 +27,15 @@ astree* adopt1 (astree* root, astree* child);
 
 // Append two children to the vector of children.
 astree* adopt2 (astree* root, astree* left, astree* right);
+
+// Adopt all grandchildren of node child
+astree* adoptall (astree* root, astree* child);
+
+// Makes an otherwise younger sibling firstborn
+astree* makeheir (astree* root, astree* child);
+
+// Make new node with synthetic Token, adopt donor
+astree* synthtok (int symbol, astree* donor);
 
 // Dump an astree to a FILE.
 void dump_astree (FILE* outfile, astree* root);

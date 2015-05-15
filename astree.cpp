@@ -1,3 +1,6 @@
+// dsalisbu
+// 1224878
+
 
 #include <assert.h>
 #include <inttypes.h>
@@ -32,6 +35,30 @@ astree* adopt2 (astree* root, astree* left, astree* right) {
    adopt1 (root, left);
    adopt1 (root, right);
    return root;
+}
+
+astree* adoptall (astree* root, astree* child) {
+   auto itor = child->children.begin(); 
+   for(; itor != child->children.end(); ++itor ){
+      adopt1(root, *itor);
+   }
+   while(!child->children.empty()) child->children.pop_back();
+   return root;
+}
+
+astree* makeheir (astree* root, astree* child ) {
+   root->children.insert(root->children.begin(), child);
+   DEBUGF ('a', "%p (%s) adopting %p (%s)\n",
+           root, root->lexinfo->c_str(),
+           child, child->lexinfo->c_str());
+   return root;
+}
+
+astree* synthtok (int symbol, astree* donor) {
+   astree* node = new astree(symbol, donor->filenr, donor->linenr,
+                    donor->offset, "");
+   adopt1(node, donor);
+   return node;
 }
 
 
@@ -71,25 +98,29 @@ void tok_dump_astree (FILE* outfile, astree* root) {
 }
 
 static void dump_node (FILE* outfile, astree* node) {
-   fprintf (outfile, "%p->{%s(%d) %ld:%ld.%03ld \"%s\" [",
-            node, get_yytname (node->symbol), node->symbol,
-            node->filenr, node->linenr, node->offset,
-            node->lexinfo->c_str());
+   const char *tname = get_yytname (node->symbol);
+   if (strstr (tname, "TOK_") == tname) tname += 4;
+   fprintf (outfile, "%s \"%s\" %ld:%ld.%03ld",
+            tname, node->lexinfo->c_str(),
+            node->filenr, node->linenr, node->offset);
    bool need_space = false;
    for (size_t child = 0; child < node->children.size();
         ++child) {
       if (need_space) fprintf (outfile, " ");
       need_space = true;
-      fprintf (outfile, "%p", node->children.at(child));
+      //fprintf (outfile, "%p", node->children.at(child));
    }
-   fprintf (outfile, "]}");
+   //fprintf (outfile, "]}");
 }
 
 static void dump_astree_rec (FILE* outfile, astree* root,
                              int depth) {
    if (root == NULL) return;
-   fprintf (outfile, "%*s%s ", depth * 3, "",
-            root->lexinfo->c_str());
+   for(int i=0; i<depth; i++) {
+      fprintf(outfile, "|  ");
+   }
+   //fprintf (outfile, "%*s%s ", depth * 0, "",
+   //         root->lexinfo->c_str());
    dump_node (outfile, root);
    fprintf (outfile, "\n");
    for (size_t child = 0; child < root->children.size();
@@ -133,5 +164,5 @@ void free_ast2 (astree* tree1, astree* tree2) {
    free_ast (tree2);
 }
 
-RCSC("$Id: astree.cpp,v 1.2 2015-04-26 21:23:14-07 - - $")
+RCSC("$Id: astree.cpp,v 1.1 2015-05-04 13:36:08-07 - - $")
 

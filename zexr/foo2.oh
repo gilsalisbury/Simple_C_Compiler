@@ -1,7 +1,0 @@
-// $Id: foo2.oh,v 1.1 2015-04-13 13:09:56-07 - - $
-__FILE__ __LINE__ __DATE__ __TIME__
-foo2.h, line 3.
-foo2.h, line 4.
-// Comment.
-foo2.h, line 6. /* Comment */ last line
-#define FOO2 "foo2"

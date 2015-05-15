@@ -1,10 +1,10 @@
-// $Id: cppstrtok.cpp,v 1.3 2015-04-27 21:13:49-07 - - $
+
 // dsalisbu
 // 1224878
 
 // Use cpp to scan a file and print line numbers.
 // Print out each input line read in, then strtok it for
-// tokens.
+// tokens and parse for abstract syntax tree.
 
 #include <string>
 #include <iostream>
@@ -28,6 +28,7 @@ const string CPP = "/usr/bin/cpp";
 const size_t LINESIZE = 1024;
 extern int yy_flex_debug;
 extern FILE* tokenout;
+FILE* astout;
 
 // Chomp the last character from a buffer if it is delim.
 void chomp (char* string, char delim) {
@@ -42,7 +43,7 @@ void chomp (char* string, char delim) {
 
 int main (int argc, char** argv) {
    int c;
-   string name, ext, strfn, tokfn;
+   string name, ext, strfn, tokfn, astfn;
 
    // check if name is long enough to contain .oc
    name = string(argv[argc-1]);
@@ -64,6 +65,7 @@ int main (int argc, char** argv) {
    strfn = basename(argv[argc-1]);
    strfn = strfn.substr(0, strfn.length()-3);
    tokfn = strfn + ".tok";
+   astfn = strfn + ".ast";
    strfn += ".str";
    DEBUGF('d', name.c_str());
    yy_flex_debug = 0;
@@ -90,6 +92,7 @@ int main (int argc, char** argv) {
                yy_flex_debug = 1;
                break;
             case 'y':
+               yydebug = 1;
                break;
             default: 
                errprintf ("usage: oc [-ly] [-@ flag...] "
@@ -109,12 +112,9 @@ int main (int argc, char** argv) {
       }else {
          int parsecode;
          tokenout = fopen(tokfn.c_str(), "w");
-         for(;;){
-            parsecode = yylex();
-            if (parsecode == YYEOF) {
-               break;
-            }
-         }
+         astout = fopen(astfn.c_str(), "w");
+         parsecode = yyparse();
+         if (parsecode == YYEOF) {/*do nothing*/}
          int pclose_rc = pclose (yyin) >> 8;
          if (pclose_rc != 0){
             fprintf(stderr, "invalid file name\n");
@@ -123,8 +123,11 @@ int main (int argc, char** argv) {
             // open outfile &ostream
             stringout.open(strfn, ostream::out);
             dump_stringset(stringout);
+            dump_astree(astout, yyparse_astree);
+            fclose(astout);
             stringout.close();
             fclose(tokenout);
+            free_ast(yyparse_astree);
          }
          eprint_status (command.c_str(), pclose_rc);
       }

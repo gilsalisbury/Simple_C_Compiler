@@ -1,5 +1,0 @@
-#ifdef foo
-foo is defined
-#else
-foo is not defined
-#endif

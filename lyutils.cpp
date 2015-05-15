@@ -1,3 +1,6 @@
+// dsalisbu
+// 1224878
+
 
 #include <vector>
 #include <string>
@@ -77,7 +80,8 @@ int yylval_token (int symbol) {
    yylval = new astree (symbol, included_filenames.size() - 1,
                         scan_linenr, offset, yytext);
    tok_dump_astree(tokenout, yylval);
-   free_ast(yylval);
+   //dump_astree(stdout, TOK_ROOT);
+   //free_ast(yylval);
    return symbol;
 }
 
