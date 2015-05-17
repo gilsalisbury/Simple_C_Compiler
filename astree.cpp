@@ -9,11 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "symboltable.h"
 #include "astree.h"
 #include "stringset.h"
 #include "lyutils.h"
-#include "symboltable.h"
-
 
 
 
@@ -64,7 +63,6 @@ astree* synthtok (int symbol, astree* donor) {
    return node;
 }
 
-
 static void tok_dump_node (FILE* outfile, astree* node) {
    fprintf (outfile, "%4d%4d.%03d %4d %-16s (%s)",
             int(node->filenr), int(node->linenr), int(node->offset),
@@ -91,7 +89,6 @@ static void tok_dump_astree_rec (FILE* outfile, astree* root,
    }
 }
 
-
 void tok_dump_astree (FILE* outfile, astree* root) {
    tok_dump_astree_rec (outfile, root, 0);
    fflush (NULL);
@@ -100,9 +97,10 @@ void tok_dump_astree (FILE* outfile, astree* root) {
 static void dump_node (FILE* outfile, astree* node) {
    const char *tname = get_yytname (node->symbol);
    if (strstr (tname, "TOK_") == tname) tname += 4;
-   fprintf (outfile, "%s \"%s\" %ld:%ld.%03ld",
+   fprintf (outfile, "%s \"%s\" %ld:%ld.%03ld %6s",
             tname, node->lexinfo->c_str(),
-            node->filenr, node->linenr, node->offset);
+            node->filenr, node->linenr, node->offset,
+            getattr(node->attr).c_str());
    bool need_space = false;
    for (size_t child = 0; child < node->children.size();
         ++child) {
@@ -129,9 +127,6 @@ static void dump_astree_rec (FILE* outfile, astree* root,
 static void postorder (FILE* outfile, astree* root,
                              int depth) {
    if (root == NULL) return;
-   func foo = getfunc(root->symbol);
-   foo(root);
-   
    for (size_t child = 0; child < root->children.size();
         ++child) {
       postorder (outfile, root->children[child],
@@ -140,10 +135,11 @@ static void postorder (FILE* outfile, astree* root,
    for(int i=0; i<depth; i++) {
       fprintf(outfile, "|  ");
    }
+   func foo = getfunc(root->symbol);
+   foo(root);
    dump_node (stdout, root);
    fprintf (outfile, "\n");
 }
-
 
 static void preorder (FILE* outfile, astree* root,
                              int depth) {
@@ -168,6 +164,8 @@ void type_ast (FILE* outfile, astree* root) {
    preorder (outfile, root, 0);
    printf("\n\n\n");
    postorder (outfile, root, 0);
+
+   preorder (outfile, root, 0);
    fflush (NULL);
 }
 

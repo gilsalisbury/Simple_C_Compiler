@@ -1,7 +1,6 @@
 
 
-int a = 4 + 1;
 
-{
-   int c = 0;
-}
+int b = 63;
+
+int c = 3 + b;
