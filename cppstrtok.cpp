@@ -124,6 +124,7 @@ int main (int argc, char** argv) {
             stringout.open(strfn, ostream::out);
             dump_stringset(stringout);
             dump_astree(astout, yyparse_astree);
+            type_ast(stdout, yyparse_astree);
             fclose(astout);
             stringout.close();
             fclose(tokenout);

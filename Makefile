@@ -10,8 +10,8 @@ VALGRIND  = valgrind --leak-check=full --show-reachable=yes
 #
 # Definitions of list of files:
 #
-HSOURCES  = astree.h lyutils.h auxlib.h  stringset.h
-CSOURCES  = astree.cpp lyutils.cpp auxlib.cpp \
+HSOURCES  = astree.h lyutils.h auxlib.h  stringset.h symboltable.h
+CSOURCES  = astree.cpp lyutils.cpp auxlib.cpp symboltable.cpp\
 			stringset.cpp cppstrtok.cpp
 LSOURCES  = scanner.l
 YSOURCES  = parser.y

@@ -6,10 +6,19 @@
 
 #include <string>
 #include <vector>
+#include <bitset>
 using namespace std;
-
 #include "auxlib.h"
 
+enum { ATTR_void, ATTR_bool, ATTR_char, ATTR_int, ATTR_null,
+       ATTR_string, ATTR_struct, ATTR_array, ATTR_function,
+       ATTR_variable, ATTR_field, ATTR_typeid, ATTR_param,
+       ATTR_lval, ATTR_const, ATTR_vreg, ATTR_vaddr,
+       ATTR_bitset_size,
+};
+
+
+using attr_bitset = bitset<ATTR_bitset_size>;
 
 struct astree {
    int symbol;               // token code
@@ -18,6 +27,7 @@ struct astree {
    size_t offset;            // offset of token with current line
    const string* lexinfo;    // pointer to lexical information
    vector<astree*> children; // children of this n-way node
+   attr_bitset attr;
    astree (int symbol, int filenr, int linenr,
            int offset, const char* clexinfo);
 };
@@ -42,6 +52,9 @@ void dump_astree (FILE* outfile, astree* root);
 
 // Dump an astree to a FILE.
 void tok_dump_astree (FILE* outfile, astree* root);
+
+// Begin typecheck AST.
+void type_ast (FILE* outfile, astree* root);
 
 // Debug print an astree.
 void yyprint (FILE* outfile, unsigned short toknum,

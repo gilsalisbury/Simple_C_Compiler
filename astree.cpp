@@ -12,6 +12,9 @@
 #include "astree.h"
 #include "stringset.h"
 #include "lyutils.h"
+#include "symboltable.h"
+
+
 
 
 astree::astree (int symbol, int filenr, int linenr,
@@ -80,10 +83,7 @@ static void tok_dump_node (FILE* outfile, astree* node) {
 static void tok_dump_astree_rec (FILE* outfile, astree* root,
                              int depth) {
    if (root == NULL) return;
-   //fprintf (outfile, "%*s%s ", depth * 3, "",
-   //         root->lexinfo->c_str());
    tok_dump_node (outfile, root);
-   //fprintf (outfile, "\n");
    for (size_t child = 0; child < root->children.size();
         ++child) {
       tok_dump_astree_rec (outfile, root->children[child],
@@ -108,9 +108,7 @@ static void dump_node (FILE* outfile, astree* node) {
         ++child) {
       if (need_space) fprintf (outfile, " ");
       need_space = true;
-      //fprintf (outfile, "%p", node->children.at(child));
    }
-   //fprintf (outfile, "]}");
 }
 
 static void dump_astree_rec (FILE* outfile, astree* root,
@@ -119,8 +117,6 @@ static void dump_astree_rec (FILE* outfile, astree* root,
    for(int i=0; i<depth; i++) {
       fprintf(outfile, "|  ");
    }
-   //fprintf (outfile, "%*s%s ", depth * 0, "",
-   //         root->lexinfo->c_str());
    dump_node (outfile, root);
    fprintf (outfile, "\n");
    for (size_t child = 0; child < root->children.size();
@@ -128,6 +124,51 @@ static void dump_astree_rec (FILE* outfile, astree* root,
       dump_astree_rec (outfile, root->children[child],
                        depth + 1);
    }
+}
+
+static void postorder (FILE* outfile, astree* root,
+                             int depth) {
+   if (root == NULL) return;
+   func foo = getfunc(root->symbol);
+   foo(root);
+   
+   for (size_t child = 0; child < root->children.size();
+        ++child) {
+      postorder (outfile, root->children[child],
+                       depth + 1);
+   }
+   for(int i=0; i<depth; i++) {
+      fprintf(outfile, "|  ");
+   }
+   dump_node (stdout, root);
+   fprintf (outfile, "\n");
+}
+
+
+static void preorder (FILE* outfile, astree* root,
+                             int depth) {
+   if (root == NULL) return;
+   for(int i=0; i<depth; i++) {
+      fprintf(outfile, "|  ");
+   }
+   //func foo = getfunc(root->symbol);
+   //foo(root);
+   
+   dump_node (stdout, root);
+   fprintf (outfile, "\n");
+   for (size_t child = 0; child < root->children.size();
+        ++child) {
+      preorder (outfile, root->children[child],
+                       depth + 1);
+   }
+}
+
+void type_ast (FILE* outfile, astree* root) {
+   init_symbol_table();
+   preorder (outfile, root, 0);
+   printf("\n\n\n");
+   postorder (outfile, root, 0);
+   fflush (NULL);
 }
 
 void dump_astree (FILE* outfile, astree* root) {
