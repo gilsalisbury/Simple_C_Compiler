@@ -38,9 +38,6 @@ void chomp (char* string, char delim) {
    if (*nlpos == delim) *nlpos = '\0';
 }
 
-
-
-
 int main (int argc, char** argv) {
    int c;
    string name, ext, strfn, tokfn, astfn;

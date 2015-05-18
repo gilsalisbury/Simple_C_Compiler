@@ -1,6 +1,8 @@
 
-
+string a = "34";
 
 int b = 63;
 
-int c = 3 + b;
+int c = 2 * b;
+
+int b = 2 + 6;

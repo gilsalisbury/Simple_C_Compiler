@@ -24,7 +24,7 @@ astree* yyparse_astree = NULL;
 int scan_linenr = 1;
 int scan_offset = 0;
 bool scan_echo = false;
-vector<string> included_filenames;
+extern vector<string> included_filenames;
 std::ofstream stringout;
 FILE* tokenout;
 
@@ -74,6 +74,7 @@ void lexer_badtoken (char* lexeme) {
               included_filenames.back().c_str(),
               scan_linenr, lexeme);
 }
+
 
 int yylval_token (int symbol) {
    int offset = scan_offset - yyleng;

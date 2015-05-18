@@ -100,7 +100,7 @@ static void dump_node (FILE* outfile, astree* node) {
    fprintf (outfile, "%s \"%s\" %ld:%ld.%03ld %6s",
             tname, node->lexinfo->c_str(),
             node->filenr, node->linenr, node->offset,
-            getattr(node->attr).c_str());
+            strattr(node->attr).c_str());
    bool need_space = false;
    for (size_t child = 0; child < node->children.size();
         ++child) {
@@ -164,7 +164,7 @@ void type_ast (FILE* outfile, astree* root) {
    preorder (outfile, root, 0);
    printf("\n\n\n");
    postorder (outfile, root, 0);
-
+   printf("\n\n\n");
    preorder (outfile, root, 0);
    fflush (NULL);
 }

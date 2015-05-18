@@ -39,6 +39,7 @@ void lexer_newline (void);
 void lexer_setecho (bool echoflag);
 void lexer_useraction (void);
 
+
 astree* new_parseroot (void);
 int yylval_token (int symbol);
 

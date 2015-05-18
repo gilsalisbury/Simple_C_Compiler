@@ -19,7 +19,7 @@ using symbol_stack = vector<symbol_table*>;
 
 
 struct symbol {
-    attr_bitset attributes;
+    attr_bitset attr;
     symbol_table* fields;
     size_t filenr, linenr, offset;
     size_t blocknr;
@@ -33,7 +33,7 @@ void init_symbol_table();
 bool attr_and(attr_bitset, ... );
 bool attr_or(attr_bitset, ... );
 bool insert (const string* str, symbol* sym);
-string getattr (attr_bitset bits);
+string strattr (attr_bitset bits);
 
 
 typedef void (*func) (astree* root);
