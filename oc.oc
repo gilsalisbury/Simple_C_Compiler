@@ -1,8 +1,10 @@
 
-string a = "34";
 
-int b = 63;
+int a = 0;
 
-int c = 2 * b;
-
-int b = 2 + 6;
+{
+	a = 0 + 8;
+	{
+	    a = 4;
+	}
+}
