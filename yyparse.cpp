@@ -1718,7 +1718,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 67 "parser.y"
     { (yyval) = synthtok(TOK_FUNCTION, (yyvsp[(1) - (4)])); 
-                                    adopt2((yyvsp[(1) - (4)]), (yyvsp[(2) - (4)]), (yyvsp[(4) - (4)])); free_ast((yyvsp[(3) - (4)]));
+                                    adopt2((yyval), (yyvsp[(2) - (4)]), (yyvsp[(4) - (4)])); free_ast((yyvsp[(3) - (4)]));
                                     sym((yyvsp[(2) - (4)]),TOK_PARAMLIST); ;}
     break;
 
@@ -1735,7 +1735,7 @@ yyreduce:
 /* Line 1455 of yacc.c  */
 #line 75 "parser.y"
     { (yyval) = synthtok(TOK_PROTOTYPE, (yyvsp[(1) - (4)]));
-                                    adopt1((yyvsp[(1) - (4)]), (yyvsp[(2) - (4)])); free_ast((yyvsp[(3) - (4)])); 
+                                    adopt1((yyval), (yyvsp[(2) - (4)])); free_ast((yyvsp[(3) - (4)])); 
                                     sym((yyvsp[(2) - (4)]),TOK_PARAMLIST); ;}
     break;
 

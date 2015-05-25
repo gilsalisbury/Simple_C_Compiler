@@ -65,7 +65,7 @@ function    : identdecl identdeclst ')' funcblock
             
             | identdecl '(' ')' funcblock          
                                     { $$ = synthtok(TOK_FUNCTION, $1); 
-                                    adopt2($1, $2, $4); free_ast($3);
+                                    adopt2($$, $2, $4); free_ast($3);
                                     sym($2,TOK_PARAMLIST); }
             
             | identdecl identdeclst ')' ';'        
@@ -73,7 +73,7 @@ function    : identdecl identdeclst ')' funcblock
                                     adopt1($$, $2); free_ast($3); }
             
             | identdecl '(' ')' ';' { $$ = synthtok(TOK_PROTOTYPE, $1);
-                                    adopt1($1, $2); free_ast($3); 
+                                    adopt1($$, $2); free_ast($3); 
                                     sym($2,TOK_PARAMLIST); }
             ; 
 

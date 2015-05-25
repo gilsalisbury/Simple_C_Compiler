@@ -1,0 +1,17 @@
+The program being debugged has been started already.
+Start it from the beginning? (y or n) Starting program: /afs/cats.ucsc.edu/users/y/dsalisbu/private/cmps104/asg4/oc oc.oc
+Detaching after fork from child process 32062.
+
+Program received signal SIGSEGV, Segmentation fault.
+memcpy () at ../sysdeps/x86_64/memcpy.S:422
+422		movq	16(%rsi), %r9
+A debugging session is active.
+
+	Inferior 1 [process 32048] will be killed.
+
+Quit anyway? (y or n) Please answer y or n.
+A debugging session is active.
+
+	Inferior 1 [process 32048] will be killed.
+
+Quit anyway? (y or n) 

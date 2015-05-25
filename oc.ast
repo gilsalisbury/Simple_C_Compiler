@@ -1,15 +1,16 @@
-ROOT "" 0:0.000        
-|  VARDECL "=" 3:3.006        
+ROOT "" 0:0.000         
+|  FUNCTION "" 3:3.000         
 |  |  INT "int" 3:3.000       
-|  |  |  DECLID "a" 3:3.004       
-|  |  INTCON "0" 3:3.008       
-|  BLOCK "{" 3:5.000        
-|  |  '=' "=" 3:6.003        
-|  |  |  IDENT "a" 3:6.001       
-|  |  |  '+' "+" 3:6.007        
-|  |  |  |  INTCON "0" 3:6.005       
-|  |  |  |  INTCON "8" 3:6.009       
-|  |  BLOCK "{" 3:7.001       
-|  |  |  '=' "=" 3:8.007        
-|  |  |  |  IDENT "a" 3:8.005       
-|  |  |  |  INTCON "4" 3:8.009       
+|  |  |  DECLID "get" 3:3.004       
+|  |  PARAMLIST "(" 3:3.008       
+|  |  |  INT "int" 3:3.009       
+|  |  |  |  DECLID "a" 3:3.013       
+|  |  BLOCK "{" 3:3.016       
+|  STRUCT "struct" 3:9.000        
+|  |  TYPEID "foo" 3:9.007       
+|  |  TYPEID "bar" 3:10.001       
+|  |  |  FIELD "b" 3:10.005       
+|  PROTOTYPE "" 3:13.000        
+|  |  TYPEID "bar" 3:13.000       
+|  |  |  DECLID "makefoo" 3:13.004       
+|  |  PARAMLIST "(" 3:13.011       

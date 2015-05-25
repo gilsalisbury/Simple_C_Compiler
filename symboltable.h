@@ -19,8 +19,9 @@ using symbol_stack = vector<symbol_table*>;
 
 
 struct symbol {
+	const string* lexinfo = NULL;
     attr_bitset attr;
-    symbol_table* fields;
+    symbol_table* fields = NULL;
     size_t filenr, linenr, offset;
     size_t blocknr;
     vector<symbol*>* parameters;
@@ -33,12 +34,13 @@ void init_symbol_table();
 bool attr_and(attr_bitset, ... );
 bool attr_or(attr_bitset, ... );
 bool insert (const string* str, symbol* sym);
-string strattr (attr_bitset bits);
+string strattr (astree* root);
 
 
 typedef void (*func) (astree* root);
 void vardecl_type(astree* root);
 func getfunc(int TOK_TYPE);
+void enter_block ();
 
 
 #endif

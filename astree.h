@@ -14,7 +14,7 @@ using namespace std;
 enum { ATTR_void, ATTR_bool, ATTR_char, ATTR_int, ATTR_null,
        ATTR_string, ATTR_struct, ATTR_array, ATTR_function,
        ATTR_variable, ATTR_field, ATTR_typeid, ATTR_param,
-       ATTR_lval, ATTR_const, ATTR_vreg, ATTR_vaddr,
+       ATTR_lval, ATTR_const, ATTR_vreg, ATTR_vaddr, ATTR_prototype,
        ATTR_bitset_size,
 };
 
@@ -22,6 +22,8 @@ enum { ATTR_void, ATTR_bool, ATTR_char, ATTR_int, ATTR_null,
 using attr_bitset = bitset<ATTR_bitset_size>;
 
 struct astree {
+   const string* typenm = NULL;
+   const string* oftype = NULL;
    int symbol;               // token code
    size_t filenr;            // index into filename stack
    size_t linenr;            // line number from source code
