@@ -214,7 +214,7 @@ static attr_bitset get_attr(astree* root) {
 
 
 void enter_block () {
-	printf("\nPushing symbol table %d\n", next_block);
+	//printf("\nPushing symbol table %d\n", next_block);
 	next_block += 1;
 	blocknr += 1;
 	block_count->push_back(blocknr);
@@ -231,16 +231,506 @@ void block (astree* root) {
 	stack->pop_back();
 	block_count->pop_back();
 	next_block -= 1;
-	printf("\nExiting block %d\n", next_block);
+	//printf("\nExiting block %d\n", next_block);
 }
 
+
+
+
+void call_op(astree* root) {
+	if (root == NULL) return;
+	symbol* func = lookup_func(root->children[0]->lexinfo); 
+	if (!func | !func->attr[ATTR_function]) {
+		errprintf ("%:%s: %d: error: calling undefinied function '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, root->children[0]->lexinfo->c_str());
+		    exit(1);
+	}else if (func->parameters->size() != root->children.size()-1) {
+		errprintf ("%:%s: %d: error: call does not match function"
+			" definition '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, root->children[0]->lexinfo->c_str());
+		    exit(1);
+	}
+	cout << "made it here" << endl;
+	for (size_t i = 0; i< root->children.size()-1; ++i) {
+		astree* param = root->children[i+1];
+		// come back to struct case
+		if (param->attr[ATTR_struct]) {
+			if (lookup(param->lexinfo)->fields == NULL) {
+				errprintf ("%:%s: %d: error: in function call '%s'"
+				": incomplete type definition for parameter '%s'\n",
+            	included_filenames.back().c_str(),
+           		param->linenr, 
+           		root->children[0]->lexinfo->c_str(),
+           		param->lexinfo->c_str());
+		    	exit(1);
+			}
+		}
+		cout << "made it here" << endl;
+		symbol* sym = lookup(param->lexinfo);
+		// COMPAT DOES NOT WORK!!!!!!!!!!!!!!!!!
+		//if (idtype(sym->attr) != idtype(func->parameters->at(i)->attr)) {
+		if (!compat(sym->attr, func->parameters->at(i)->attr)) {
+			errprintf ("%:%s: %d: error: invalid parameters in function: '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, root->children[i]->lexinfo->c_str());
+		    exit(1);
+		}
+	}
+	int ftype = idtype(func->attr);
+	if (ftype == ATTR_struct) {
+
+	}else{
+		root->attr.set(ftype, true);
+	}
+}
+
+
+void proto_op (astree* root) {
+	if (root == NULL) return;
+	printf("\n\nHERE\n\n");
+	astree* grandchild;
+	const string* typenm;
+	if (root->children[0]->attr[ATTR_array]) {
+		grandchild = root->children[0]->children[1];
+		typenm = root->children[0]->children[0]->lexinfo;
+	}
+	else {
+		grandchild = root->children[0]->children[0];
+		typenm = root->children[0]->lexinfo;
+	}
+	symbol* func = lookup_func(grandchild->lexinfo); 
+	if  (next_block != 2) {
+		errprintf ("%:%s: %d: error: nested function "
+			"definitions not allowed '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, grandchild->lexinfo->c_str());
+		    exit(1);
+	}
+	if (func) {
+		errprintf ("%:%s: %d: error: prototype redefines"
+			" existing identifier '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, grandchild->lexinfo->c_str());
+		    exit(1);
+	}
+	// Initalize new function symbol 	
+	func = new symbol (root->filenr, 
+    	    root->linenr, root->offset, 0);
+	if (grandchild->attr[ATTR_struct]) {
+			//getname for array case
+			symbol* strct = lookup_struct(grandchild->typenm);
+			if (!strct | !strct->fields) {
+				errprintf ("%:%s: %d: error: prototype '%s' "
+				"returns undefined type\n",
+        		included_filenames.back().c_str(),
+        		root->linenr, grandchild->lexinfo->c_str());
+				exit(1);
+			}
+	}
+	func->parameters = new vector<symbol*>;
+    func->attr.set(ATTR_prototype, true);
+    func->lexinfo = typenm;
+    grandchild->attr |= func->attr;
+    func->attr |= grandchild->attr;
+    astree* paramlist = root->children[1];
+
+    // push params into function symbol's paramlist
+	for (size_t i = 0; i < paramlist->children.size(); ++i) {
+        astree* param;
+	    	if  (paramlist->children[i]->attr[ATTR_array])
+					param = paramlist->children[i]->children[1];
+			else param = paramlist->children[i]->children[0];
+       	    symbol* sym = lookup(param->lexinfo);
+            func->parameters->push_back(sym);
+    }
+    // pop function symbol table off of variable stack
+    // and throw it in the garbage stack for storage
+    symbol_table* table = stack->back();
+    gc->push_back(table);
+    stack->pop_back();
+    block_count->pop_back();
+    --next_block;
+    // insert the function symbol into stack error if already there.
+	if(insert(grandchild->lexinfo, func)) {
+		return;
+	}else{
+		errprintf ("%:%s: %d: error: prototype redefines "
+			"existing function '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, grandchild->lexinfo->c_str());
+		    exit(1);
+	}
+
+}
+
+
+void func_op (astree* root) {
+	if (root == NULL) return;
+
+	astree* grandchild;
+	if (root->children[0]->attr[ATTR_array]) 
+		grandchild = root->children[0]->children[1];
+	else grandchild = root->children[0]->children[0];
+	symbol* func = lookup_func(grandchild->lexinfo); 
+	cout << func << endl;
+	if (next_block != 2) {
+		errprintf ("%:%s: %d: error: nested "
+			"function definitions not allowed '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, grandchild->lexinfo->c_str());
+		    exit(1);
+	}
+	if (func) {
+		if (!func->attr[ATTR_prototype]) {
+			cout << strattr(grandchild) << endl << endl;
+			errprintf ("%:%s: %d: error: function "
+				"re-defines existing identifier: '%s'\n",
+        		included_filenames.back().c_str(),
+        		root->linenr, root->lexinfo->c_str());
+			exit(1);
+		}
+		// then we type check 
+		if (func->attr[ATTR_prototype]) {
+			astree* params = root->children.at(1);
+			int ftype = idtype(func->attr);
+			if (ftype == ATTR_struct) {
+				if (grandchild->attr[ATTR_array] 
+										!= func->attr[ATTR_array]) {
+					errprintf ("%:%s: %d: error: function does not "
+							"match prototype definition '%s'\n",
+            				included_filenames.back().c_str(),
+            				root->linenr, grandchild->lexinfo->c_str());
+		    		exit(1);
+				}
+				if (lookup_struct(grandchild->typenm)) {
+					symbol* sym = lookup_struct(grandchild->typenm);
+					if (!sym->fields) {
+						errprintf ("%:%s: %d: error: function returns "
+							"a type that is undefined '%s'\n",
+            				included_filenames.back().c_str(),
+            				root->linenr, grandchild->lexinfo->c_str());
+		    			exit(1);
+		    		}
+		    		
+		    		if (grandchild->typenm != func->lexinfo) {
+		    			errprintf ("%:%s: %d: error: function '%s' returns "
+							"a differnet type from its prototype\n",
+            				included_filenames.back().c_str(),
+            				root->linenr, grandchild->lexinfo->c_str());
+		    			exit(1);
+		    		}
+				}
+			}if((params->children.size() != func->parameters->size()) |
+				(!root->children[0]->attr[ftype])) {
+				errprintf ("%:%s: %d: error: function does not "
+							"match prototype definition '%s'\n",
+            				included_filenames.back().c_str(),
+            				root->linenr, grandchild->lexinfo->c_str());
+		    	exit(1);
+			} 
+			astree* paramlist = root->children[1];
+			// iterate parmaets and check eqality
+			for (size_t i = 0; i < params->children.size(); ++i) {
+				astree* param;
+				if  (paramlist->children[i]->attr[ATTR_array])
+					param = paramlist->children[i]->children[1];
+				else param = paramlist->children[i]->children[0];
+				symbol * sym = lookup (param->lexinfo);
+				attr_bitset bits = sym->attr | func->parameters->at(i)->attr; 
+        		if ((bits != sym->attr) | (sym->lexinfo != 
+        						func->parameters->at(i)->lexinfo)) {
+        			errprintf ("%:%s: %d: error: function '%s' param"
+						"meters do not match prototype definition\n",
+            			included_filenames.back().c_str(),
+            			root->linenr, grandchild->lexinfo->c_str());
+		    		exit(1);
+        		}
+    		}
+    		cout << "NOT YET1" << endl;
+    		func->attr.set(ATTR_prototype, false);
+    		func->attr.set(ATTR_function, true);
+    		grandchild->attr.set(ATTR_function, true);
+    		symbol_table* table = stack->back();
+    		gc->push_back(table);
+    		stack->pop_back();
+    		block_count->pop_back();
+    		--next_block;
+		}
+	}else{
+
+		func = new symbol (root->filenr, 
+    	    root->linenr, root->offset, 0);
+		if (grandchild->attr[ATTR_struct]) {
+			//getname for array case
+			symbol* strct = lookup_struct(grandchild->typenm);
+			if (!strct | !strct->fields) {
+				errprintf ("%:%s: %d: error: funciton '%s' returns undefined type\n",
+        		included_filenames.back().c_str(),
+        		root->linenr, grandchild->lexinfo->c_str());
+				exit(1);
+			}
+		}
+		func->parameters = new vector<symbol*>;
+		grandchild->attr |= root->children[0]->attr;
+		grandchild->attr.set(ATTR_function, true);
+		func->attr |= grandchild->attr;
+		astree* paramlist = root->children.at(1);
+	    for (size_t i = 0; i < paramlist->children.size(); ++i) {   
+	    	astree* param;
+	    	if  (paramlist->children[i]->attr[ATTR_array])
+					param = paramlist->children[i]->children[1];
+			else param = paramlist->children[i]->children[0];
+       	    symbol* sym = lookup(param->lexinfo);
+            func->parameters->push_back(sym);
+        }
+        symbol_table* table = stack->back();
+    	gc->push_back(table);
+    	stack->pop_back();
+    	block_count->pop_back();
+    	--next_block;
+    	if (!insert(grandchild->lexinfo, func)) {
+    		errprintf ("%:%s: %d: error: funciton redefinition '%s'\n",
+        		included_filenames.back().c_str(),
+        		root->linenr, root->lexinfo->c_str());
+			exit(1);
+    	}
+	}
+}
+
+// add type checking
+void paramlist (astree* root) {
+	cout << "in paramlist" << endl;
+	if  (root == NULL) return;
+	for (size_t i = 0; i< root->children.size(); ++i) {
+		if (root->children[i]->attr[ATTR_struct]) {
+			astree* param;
+			if (root->children[i]->attr[ATTR_array]) 
+				param = root->children[i]->children[1];
+			else param = root->children[i];
+			if (lookup_struct(param->lexinfo)->fields == NULL) {
+				errprintf ("%:%s: %d: error: undefined type '%s'\n",
+            	included_filenames.back().c_str(),
+           		root->children[i]->linenr, 
+           		root->children[i]->lexinfo->c_str());
+		    	exit(1);
+			}
+		}
+		astree* grandchild;
+		if (root->children[i]->attr[ATTR_array]) 
+			grandchild = root->children[i]->children[1];
+		else grandchild = root->children[i]->children[0];
+		cout << "looking up " << grandchild->lexinfo->c_str() << endl;
+		symbol* sym = lookup(grandchild->lexinfo);
+		sym->lexinfo = grandchild->lexinfo;
+		sym->attr |= root->children[i]->attr;
+		sym->attr.set(ATTR_param, true);
+		grandchild->attr |= sym->attr;
+	}
+	cout << "exit paramlist" << endl;
+}
+
+
+// print entire subtre
+void struct_op (astree* root) {
+	if  (root == NULL) return;
+	if  (next_block != 2) {
+		errprintf ("%:%s: %d: error: nested struct definitions not allowed '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, root->lexinfo->c_str());
+		    exit(1);
+	}
+	astree* child = root->children[0];
+    if  (lookup_struct(child->lexinfo) && 
+		 lookup_struct(child->lexinfo)->fields) {
+		errprintf ("%:%s: %d: error: redefinition of type: '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, child->lexinfo->c_str());
+		    exit(1);
+	}
+	for (size_t i = 1; i < root->children.size(); ++i) {
+    	astree* child = root->children[i];
+    	cout << endl << i << endl;
+        if (child->attr[ATTR_array]) {
+    		child->children[1]->oftype = root->children[0]->typenm;
+    		cout << "ARRAY FIELD" << endl;
+    	}else {
+        	child->children[0]->oftype = root->children[0]->typenm;
+        	cout << "NONARRAY FIELD" << endl;
+    	}
+    }
+    //cout << "IN STRUCT" << endl;
+    symbol_table* table = stack->back();
+    symbol* sym = lookup_struct(child->lexinfo);
+    sym->lexinfo = child->lexinfo;
+    sym->fields = table;
+    stack->pop_back();
+    block_count->pop_back();
+    --next_block;
+    //cout << "EXIT STRUCT" << endl;
+	return;
+}
+
+
+
+void newarray_op (astree* root) {
+	//cout << "in newarray" << endl;
+	if  (root == NULL) return;
+	root->attr |= root->children[0]->attr;
+	if  (root->children[0]->attr[ATTR_struct]) {
+		root->typenm = root->children[0]->lexinfo;
+	}
+	//cout << "exit newarray" << endl;
+}
+
+void array_op (astree* root) {
+	cout << "in array" << endl;
+	if  (root == NULL) return;
+	root->attr |= root->children[0]->attr;
+	root->attr.set(ATTR_array, true);
+	root->children[1]->attr |= root->children[0]->attr;
+	root->children[1]->attr.set(ATTR_array, true);
+	if  (root->children[0]->attr[ATTR_struct]) {
+		root->typenm = root->children[0]->lexinfo;
+		root->children[1]->typenm = root->children[0]->typenm;
+	}
+	cout << "exit array" << endl;
+}
+
+
+void type_id (astree* root) {
+	
+	if  (root == NULL) return;
+	root->typenm = root->lexinfo;
+	root->oftype = root->lexinfo;
+    if(root->children.size() == 0) {
+    	symbol* sym = new symbol (root->filenr, 
+    	    root->linenr, root->offset, block_count->back());
+    	sym->attr.set(ATTR_struct, true);
+    	sym->lexinfo = root->lexinfo;
+    	bool insert = insert_struct(root->lexinfo, sym);
+    	sym = lookup_struct(root->lexinfo);
+		if(insert) {
+    		root->attr.set(ATTR_struct, true);
+    	}else {
+    		root->attr.set(ATTR_struct, true);
+    	}
+    }else if (root->children.size() == 1) {
+        if (lookup_struct(root->lexinfo)){
+        	
+        	symbol* sym = lookup_struct(root->lexinfo);
+        	root->attr.set(ATTR_struct, true);
+        	root->children[0]->attr.set(ATTR_struct, true);
+        	root->children[0]->typenm = root->lexinfo;
+        	root->children[0]->oftype = root->lexinfo;
+        	sym->attr.set(ATTR_struct, true);
+        	sym = lookup(root->children[0]->lexinfo);
+        	sym->attr.set(ATTR_struct, true);
+        	sym->lexinfo = root->lexinfo;
+
+        	
+        }else{
+
+        	symbol *sym = new symbol (root->filenr, 
+    	    root->linenr, root->offset, block_count->back());
+        	sym->attr.set(ATTR_struct, true);
+        	root->attr.set(ATTR_struct, true);
+        	root->children[0]->attr.set(ATTR_struct, true);
+        	root->children[0]->typenm = root->lexinfo;
+        	root->children[0]->oftype = root->lexinfo;
+        	insert_struct(root->lexinfo, sym);
+        	sym = lookup(root->children[0]->lexinfo);
+        	sym->attr.set(ATTR_struct, true);
+        	sym->lexinfo = root->lexinfo;
+        }
+    }
+    
+    return;
+}
+
+
+void field (astree* root) {
+	
+	if  (root == NULL) return;
+	if  (root->symbol != TOK_FIELD) return;
+	root->attr.set(ATTR_field, true);
+	root->typenm = root->lexinfo;
+	symbol* sym = new symbol (root->filenr, 
+    	root->linenr, root->offset, block_count->back());
+    if (!insert(root->lexinfo, sym)) {
+    	errprintf ("%:%s: %d: error: redeclartion of field: '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, root->lexinfo->c_str());
+		    exit(1);
+    }
+    
+    return;
+}
+
+
+
+void declid (astree* root) {
+	//cout << "in declid" << endl;
+	if  (root == NULL) return;
+	if  ((root->symbol == TOK_DECLID) | 
+		(root->symbol == TOK_FIELD) | 
+		(root->symbol == TOK_TYPEID)) {
+    	symbol *sym = new symbol(root->filenr, 
+    	    root->linenr, root->offset, block_count->back());
+    	sym->attr.set(ATTR_lval, true);
+    	if(insert(root->lexinfo, sym)) {
+    		//cout << "inserted: " << root->lexinfo->c_str() << endl;
+    		root->attr.set(ATTR_lval, true);
+    		//cout << "exit declid" << endl << endl;
+    		return;
+    	}else {
+    		errprintf ("%:%s: %d: error: redeclaration of identifier : '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, root->lexinfo->c_str());
+		    exit(1);
+    	}
+    }
+}
+
+
+// need dump_node funct
+void vardecl (astree* root) {
+	//printf("entered vardecl\n");
+    if  (root == NULL) return;
+    astree* grandchild;
+    if (root->children.front()->attr[ATTR_array]) 
+    	grandchild = root->children.front()
+    								->children.back();
+    else grandchild = root->children.front()
+    								->children.front();
+    //cout << "here" << endl;
+    if  (compat(root->children.front()->attr, 
+    	root->children.back()->attr)) {
+    	///cout << "here1" << endl;
+    	int type = idtype(root->children.back()->attr);
+  		grandchild->attr.set(ATTR_variable, true);
+  		///cout << "here2" << endl;
+  		symbol * sym = lookup(grandchild->lexinfo);
+  		//cout << "here3" << endl;
+  		sym->attr.set(ATTR_variable, true);
+  		//cout << "here4" << endl;
+  		sym->attr.set(type, true);
+    }else{
+    	errprintf ("%:%s: %d: error: invalid declaration : '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, root->children.front()->lexinfo->c_str());
+		    exit(1);
+    }
+    //printf("exit vardecl\n");
+}
 
 void ifelse_op(astree* root) {
 	if  (root == NULL) return;
 	astree* left = root->children.front();
 	attr_bitset lbits = get_attr(left);
 	if (lbits[ATTR_bool]) {
-		printf("attrs are %s\n", left->lexinfo->c_str());
+		//printf("attrs are %s\n", left->lexinfo->c_str());
 		return;
 	}else{
 		errprintf ("%:%s: %d: error: required type bool, found type '%s'\n",
@@ -256,7 +746,7 @@ void while_op(astree* root) {
 	astree* left = root->children.front();
 	attr_bitset lbits = get_attr(left);
 	if (lbits[ATTR_bool]) {
-		printf("attrs are %s\n", left->lexinfo->c_str());
+		//printf("attrs are %s\n", left->lexinfo->c_str());
 		return;
 	}else{
 		errprintf ("%:%s: %d: error: required type bool, found type '%s'\n",
@@ -368,59 +858,18 @@ void div_op (astree* root) {
 }
 
 
-void declid (astree* root) {
-	cout << "in declid" << endl;
-	if  (root == NULL) return;
-	if  ((root->symbol == TOK_DECLID) | 
-		(root->symbol == TOK_FIELD) | 
-		(root->symbol == TOK_TYPEID)) {
-    	symbol *sym = new symbol(root->filenr, 
-    	    root->linenr, root->offset, block_count->back());
-    	sym->attr.set(ATTR_lval, true);
-    	if(insert(root->lexinfo, sym)) {
-    		cout << "inserted: " << root->lexinfo->c_str() << endl;
-    		root->attr.set(ATTR_lval, true);
-    		cout << "exit declid" << endl << endl;
-    		return;
-    	}else {
-    		errprintf ("%:%s: %d: error: redeclaration of identifier : '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->lexinfo->c_str());
-		    exit(1);
-    	}
-    }
-}
-
-
-// need dump_node funct
-void vardecl (astree* root) {
-	printf("entered vardecl\n");
-    if  (root == NULL) return;
-    if  (compat(root->children.front()->attr, 
-    	root->children.back()->attr)) {
-    	int type = idtype(root->children.back()->attr);
-    	astree* grandchild = root->children.front()->children.front();
-  		grandchild->attr.set(ATTR_variable, true);
-  		symbol * sym = lookup(grandchild->lexinfo);
-  		sym->attr.set(ATTR_variable, true);
-  		sym->attr.set(type, true);
-    }else{
-    	errprintf ("%:%s: %d: error: invalid declaration : '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->children.front()->lexinfo->c_str());
-		    exit(1);
-    }
-}
-
 
 void intdec (astree* root) {
+	//cout << endl << "enter intdec" << endl;
 	if  (root == NULL) return;
 	if  ((root->symbol == TOK_INT)) {
 		root->attr.set(ATTR_int, true);
+		if(root->children.size() == 0) return;
 		root->children.front()->attr.set(ATTR_int, true);
 		symbol* sym = lookup(root->children.front()->lexinfo);
 		sym->attr.set(ATTR_int, true);
     }
+    //cout << endl << "exit intdec" << endl;
 }
 
 
@@ -428,6 +877,7 @@ void chardec (astree* root) {
 	if  (root == NULL) return;
 	if  ((root->symbol == TOK_CHAR)) {
 		root->attr.set(ATTR_char, true);
+		if(root->children.size() == 0) return;
 		root->children.front()->attr.set(ATTR_char, true);
     }
 }
@@ -437,6 +887,7 @@ void stringdec (astree* root) {
 	if  (root == NULL) return;
 	if  ((root->symbol == TOK_STRING)) {
 		root->attr.set(ATTR_string, true);
+		if(root->children.size() == 0) return;
 		root->children.front()->attr.set(ATTR_string, true);
     }
 }
@@ -446,355 +897,9 @@ void booldec (astree* root) {
 	if  (root == NULL) return;
 	if  ((root->symbol == TOK_FALSE) | (root->symbol == TOK_TRUE)) {
 		root->attr.set(ATTR_bool, true);
+		if(root->children.size() == 0) return;
 		root->children.front()->attr.set(ATTR_bool, true);
     }
-}
-
-
-void call_op(astree* root) {
-	if (root == NULL) return;
-	symbol* func = lookup_func(root->children[0]->lexinfo); 
-	if (!func | !func->attr[ATTR_function]) {
-		errprintf ("%:%s: %d: error: calling undefinied function '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->children[0]->lexinfo->c_str());
-		    exit(1);
-	}else if (func->parameters->size() != root->children.size()-1) {
-		errprintf ("%:%s: %d: error: call does not match function"
-			" definition '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->children[0]->lexinfo->c_str());
-		    exit(1);
-	}
-	cout << "made it here" << endl;
-	for (size_t i = 0; i< root->children.size()-1; ++i) {
-		astree* param = root->children[i+1];
-		// come back to struct case
-		if (param->attr[ATTR_struct]) {
-			if (lookup(param->lexinfo)->fields == NULL) {
-				errprintf ("%:%s: %d: error: in function call '%s'"
-				": incomplete type definition for parameter '%s'\n",
-            	included_filenames.back().c_str(),
-           		param->linenr, 
-           		root->children[0]->lexinfo->c_str(),
-           		param->lexinfo->c_str());
-		    	exit(1);
-			}
-		}
-		cout << "made it here" << endl;
-		symbol* sym = lookup(param->lexinfo);
-		// COMPAT DOES NOT WORK!!!!!!!!!!!!!!!!!
-		//if (idtype(sym->attr) != idtype(func->parameters->at(i)->attr)) {
-		if (!compat(sym->attr, func->parameters->at(i)->attr)) {
-			errprintf ("%:%s: %d: error: invalid parameters in function: '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->children[i]->lexinfo->c_str());
-		    exit(1);
-		}
-	}
-	int ftype = idtype(func->attr);
-	if (ftype == ATTR_struct) {
-
-	}else{
-		root->attr.set(ftype, true);
-	}
-}
-
-
-void proto_op (astree* root) {
-	if (root == NULL) return;
-	printf("\n\nHERE\n\n");
-	astree* grandchild = root->children[0]->children[0];
-	symbol* func = lookup_func(grandchild->lexinfo); 
-	if  (next_block != 2) {
-		errprintf ("%:%s: %d: error: nested function definitions not allowed '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, grandchild->lexinfo->c_str());
-		    exit(1);
-	}
-	if (func) {
-		errprintf ("%:%s: %d: error: prototype redefines existing identifier '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, grandchild->lexinfo->c_str());
-		    exit(1);
-	}
-	// Initalize new function symbol 	
-	func = new symbol (root->filenr, 
-    	    root->linenr, root->offset, 0);
-	func->parameters = new vector<symbol*>;
-    func->attr.set(ATTR_prototype, true);
-    func->lexinfo = root->children[0]->lexinfo;
-    grandchild->attr |= func->attr;
-    func->attr |= grandchild->attr;
-    astree* params = root->children[1];
-
-    // push params into function symbol's paramlist
-	for (size_t i = 0; i < params->children.size(); ++i) {
-        symbol* sym = lookup(params->children[i]->children[0]->lexinfo);
-        func->parameters->push_back(sym);
-    }
-    // pop function symbol table off of variable stack
-    // and throw it in the garbage stack for storage
-    symbol_table* table = stack->back();
-    gc->push_back(table);
-    stack->pop_back();
-    block_count->pop_back();
-    --next_block;
-    // insert the function symbol into stack error if already there.
-	if(insert(grandchild->lexinfo, func)) {
-		return;
-	}else{
-		errprintf ("%:%s: %d: error: prototype redefines existing function '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, grandchild->lexinfo->c_str());
-		    exit(1);
-	}
-
-}
-
-
-void func_op (astree* root) {
-	if (root == NULL) return;
-	astree* grandchild = root->children[0]->children[0];
-	symbol* func = lookup_func(grandchild->lexinfo); 
-	cout << func << endl;
-	if (next_block != 2) {
-		errprintf ("%:%s: %d: error: nested "
-			"function definitions not allowed '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, grandchild->lexinfo->c_str());
-		    exit(1);
-	}
-	if (func) {
-		if (!func->attr[ATTR_prototype]) {
-			cout << strattr(grandchild) << endl << endl;
-			errprintf ("%:%s: %d: error: function "
-				"re-defines existing identifier: '%s'\n",
-        		included_filenames.back().c_str(),
-        		root->linenr, root->lexinfo->c_str());
-			exit(1);
-		}
-		// then we type check 
-		if (func->attr[ATTR_prototype]) {
-			astree* params = root->children.at(1);
-			int ftype = idtype(func->attr);
-			if (ftype == ATTR_struct) {
-				if (lookup_struct(grandchild->typenm)) {
-					symbol* sym = lookup_struct(grandchild->typenm);
-					if (!sym->fields) {
-						errprintf ("%:%s: %d: error: function returns "
-							"a type that is undefined '%s'\n",
-            				included_filenames.back().c_str(),
-            				root->linenr, grandchild->lexinfo->c_str());
-		    			exit(1);
-		    		}
-		    		//cout << "HERERERERERERERERERERERERERERERERERERE" << endl;
-		    		cout << grandchild->typenm->c_str() << "     " << func->lexinfo->c_str() << endl;
-		    		if (grandchild->typenm != func->lexinfo) {
-		    			errprintf ("%:%s: %d: error: function '%s' returns "
-							"a differnet type from its prototype\n",
-            				included_filenames.back().c_str(),
-            				root->linenr, grandchild->lexinfo->c_str());
-		    			exit(1);
-		    		}
-				}
-			}if((params->children.size() != func->parameters->size()) |
-				(!root->children[0]->attr[ftype])) {
-				errprintf ("%:%s: %d: error: function does not "
-							"match prototype definition '%s'\n",
-            				included_filenames.back().c_str(),
-            				root->linenr, grandchild->lexinfo->c_str());
-		    	exit(1);
-			} 
-			for (size_t i = 0; i < params->children.size(); ++i) {
-				astree* param = params->children[i]->children[0];
-				symbol * sym = lookup 
-					(param->lexinfo);
-				attr_bitset bits = sym->attr | 
-								func->parameters->at(i)->attr;
-        		if ((bits != sym->attr) | (sym->lexinfo != 
-        						func->parameters->at(i)->lexinfo)) {
-        			errprintf ("%:%s: %d: error: function '%s' param"
-						"meters do not match prototype definition\n",
-            			included_filenames.back().c_str(),
-            			root->linenr, grandchild->lexinfo->c_str());
-		    		exit(1);
-        		}
-    		}
-    		func->attr.set(ATTR_prototype, false);
-    		func->attr.set(ATTR_function, true);
-    		grandchild->attr.set(ATTR_function, true);
-    		symbol_table* table = stack->back();
-    		gc->push_back(table);
-    		stack->pop_back();
-    		block_count->pop_back();
-    		--next_block;
-		}
-	}else{
-
-		func = new symbol (root->filenr, 
-    	    root->linenr, root->offset, 0);
-		if (grandchild->attr[ATTR_struct]) {
-			//getname for array case
-			symbol* strct = lookup_struct(grandchild->typenm);
-			if (!strct | !strct->fields) {
-				errprintf ("%:%s: %d: error: funciton '%s' returns undefined type\n",
-        		included_filenames.back().c_str(),
-        		root->linenr, root->lexinfo->c_str());
-				exit(1);
-			}
-		}
-		func->parameters = new vector<symbol*>;
-		grandchild->attr |= root->children[0]->attr;
-		grandchild->attr.set(ATTR_function, true);
-		func->attr |= grandchild->attr;
-		astree* paramlst = root->children.at(1);
-	    for (size_t i = 0; i < paramlst->children.size(); ++i) {   
-       	    symbol* sym = lookup(paramlst->
-       	    	            children[i]->children[0]->lexinfo);
-            func->parameters->push_back(sym);
-        }
-        symbol_table* table = stack->back();
-    	gc->push_back(table);
-    	stack->pop_back();
-    	block_count->pop_back();
-    	--next_block;
-    	if (!insert(grandchild->lexinfo, func)) {
-    		errprintf ("%:%s: %d: error: funciton redefinition '%s'\n",
-        		included_filenames.back().c_str(),
-        		root->linenr, root->lexinfo->c_str());
-			exit(1);
-    	}
-	}
-}
-
-// add type checking
-void paramlist (astree* root) {
-	cout << "in paramlist" << endl;
-	if  (root == NULL) return;
-	for (size_t i = 0; i< root->children.size(); ++i) {
-		if (root->children[i]->attr[ATTR_struct]) {
-			if (lookup_struct(root->children[i]->
-					lexinfo)->fields == NULL) {
-				errprintf ("%:%s: %d: error: undefined type '%s'\n",
-            	included_filenames.back().c_str(),
-           		root->children[i]->linenr, 
-           		root->children[i]->lexinfo->c_str());
-		    	exit(1);
-			}
-		}
-		astree* grandchild = root->children[i]->children[0];
-		cout << "looking up " << grandchild->lexinfo->c_str() << endl;
-		symbol* sym = lookup(grandchild->lexinfo);
-		sym->lexinfo = grandchild->lexinfo;
-		sym->attr |= root->children[i]->attr;
-		sym->attr.set(ATTR_param, true);
-		grandchild->attr |= sym->attr;
-	}
-	cout << "exit paramlist" << endl;
-}
-
-
-// print entire subtre
-void struct_op (astree* root) {
-	if  (root == NULL) return;
-	if  (next_block != 2) {
-		errprintf ("%:%s: %d: error: nested struct definitions not allowed '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->lexinfo->c_str());
-		    exit(1);
-	}
-    
-    for (size_t i = 0; i < root->children.size(); ++i) {
-    	astree* child = root->children[i];
-        if(child->children.size() == 1) {
-        	child->children[0]->oftype = root->children[0]->typenm;
-        }
-    }
-    astree* child = root->children[0];
-    symbol_table* table = stack->back();
-    symbol* sym = lookup_struct(root->children[0]->lexinfo);
-    sym->lexinfo = child->lexinfo;
-    sym->fields = table;
-    stack->pop_back();
-    block_count->pop_back();
-    --next_block;
-	return;
-}
-
-
-void type_id (astree* root) {
-	
-	if  (root == NULL) return;
-	root->typenm = root->lexinfo;
-	root->oftype = root->lexinfo;
-    if(root->children.size() == 0) {
-    	symbol* sym = new symbol (root->filenr, 
-    	    root->linenr, root->offset, block_count->back());
-    	sym->attr.set(ATTR_struct, true);
-    	sym->lexinfo = root->lexinfo;
-    	bool insert = insert_struct(root->lexinfo, sym);
-    	sym = lookup_struct(root->lexinfo);
-		if(insert) {
-    		root->attr.set(ATTR_struct, true);
-    	}else if (!sym->fields) {
-    		root->attr.set(ATTR_struct, true);
-    	}else{
-    		errprintf ("%:%s: %d: error: redefinition of type: '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->lexinfo->c_str());
-		    exit(1);
-    	}
-    }else if (root->children.size() == 1) {
-        if (lookup_struct(root->lexinfo)){
-        	
-        	symbol* sym = lookup_struct(root->lexinfo);
-        	root->attr.set(ATTR_struct, true);
-        	root->children[0]->attr.set(ATTR_struct, true);
-        	root->children[0]->typenm = root->lexinfo;
-        	root->children[0]->oftype = root->lexinfo;
-        	sym->attr.set(ATTR_struct, true);
-        	sym = lookup(root->children[0]->lexinfo);
-        	sym->attr.set(ATTR_struct, true);
-        	sym->lexinfo = root->lexinfo;
-
-        	
-        }else{
-        	
-        	symbol *sym = new symbol (root->filenr, 
-    	    root->linenr, root->offset, block_count->back());
-        	sym->attr.set(ATTR_struct, true);
-        	root->attr.set(ATTR_struct, true);
-        	root->children[0]->attr.set(ATTR_struct, true);
-        	root->children[0]->typenm = root->lexinfo;
-        	root->children[0]->oftype = root->lexinfo;
-        	insert_struct(root->lexinfo, sym);
-        	sym = lookup(root->children[0]->lexinfo);
-        	sym->attr.set(ATTR_struct, true);
-        	sym->lexinfo = root->lexinfo;
-        }
-    }
-    
-    return;
-}
-
-
-void field (astree* root) {
-	
-	if  (root == NULL) return;
-	if  (root->symbol != TOK_FIELD) return;
-	root->attr.set(ATTR_field, true);
-	root->typenm = root->lexinfo;
-	symbol* sym = new symbol (root->filenr, 
-    	root->linenr, root->offset, block_count->back());
-    if (!insert(root->lexinfo, sym)) {
-    	errprintf ("%:%s: %d: error: redeclartion of field: '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->lexinfo->c_str());
-		    exit(1);
-    }
-    
-    return;
 }
 
 void ident (astree* root) {
@@ -807,8 +912,11 @@ void ident (astree* root) {
 		    exit(1);
 	}if (sym->attr[ATTR_struct]) {
 		root->typenm = sym->lexinfo;
+		sym->attr.set(ATTR_variable);
 		root->attr |= sym->attr;
+
 	}else{
+		sym->attr.set(ATTR_variable);
 		root->attr |= sym->attr;
 	}
 }
@@ -897,6 +1005,12 @@ func getfunc (int TOK_TYPE) {
 			break;
 		case (TOK_IDENT):
 			foo = ident;
+			break;
+		case (TOK_NEWARRAY):
+			foo = newarray_op;
+			break;
+		case (TOK_ARRAY):
+			foo = array_op;
 			break;
 		case (TOK_IFELSE):
 			foo = ifelse_op;

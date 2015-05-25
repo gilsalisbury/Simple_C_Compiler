@@ -270,6 +270,11 @@ allocator   : TOK_NEW TOK_IDENT '('')'
             | TOK_NEW basetype '[' expr ']'    
                                     { $$ = adopt2 ($1, $2, $4); 
                                     sym($1,TOK_NEWARRAY); 
+                                    
+                                    free_ast2($3, $5);}
+            | TOK_NEW TOK_IDENT '[' expr ']'    
+                                    { $$ = adopt2 ($1, $2, $4); 
+                                    sym($1,TOK_NEWARRAY); 
                                     sym($2,TOK_TYPEID);
                                     free_ast2($3, $5);}
             ;

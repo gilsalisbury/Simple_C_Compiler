@@ -1,14 +1,8 @@
 
 
-int get (int a) {
-	
-}
 
 
+int node( int b, int[] a );
 
-struct foo {
-	bar b;
-}
 
-bar makefoo();
-
+int node( int b, int[] d ) {}
