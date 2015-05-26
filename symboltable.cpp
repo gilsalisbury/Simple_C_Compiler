@@ -8,7 +8,7 @@ vector<string> attr_name
        "string", "struct", "array", "function",
        "variable", "field", "typeid", "param",
        "lval", "const", "vreg", "vaddr", "prototype",
-       "bitset_size",
+       "index", "bitset_size",
 	};
 
 int blocknr = 0;
@@ -66,6 +66,22 @@ symbol* lookup_struct (const string* s) {
 }
 
 
+
+symbol* lookup_field (symbol_table* table, const string* s) {
+	symbol* sym;
+	auto b = table->begin();
+	while (b != table->end()) {
+		cout << "have members: " << (b++)->first->c_str() << endl;
+	}
+	const auto& e = table->find (s);
+	if (e != table->end()) {
+		sym = e->second;
+	}else sym = NULL;
+	return sym;
+}
+
+
+
 symbol* lookup_func (const string* s) {
 	symbol* sym;
 	cout << "in look up func" << endl;
@@ -113,7 +129,7 @@ bool attr_and(attr_bitset bits, ... ) {
 static bool compat (attr_bitset Abits, attr_bitset Bbits) {
 	attr_bitset bits = Abits & Bbits;
 	if (attr_or (bits, ATTR_int, ATTR_char, ATTR_string, 
-		ATTR_bool, ATTR_typeid)) {
+		ATTR_bool, ATTR_struct)) {
 		return true;
 	}
 	return false;
@@ -594,13 +610,22 @@ void array_op (astree* root) {
 	if  (root->children[0]->attr[ATTR_struct]) {
 		root->typenm = root->children[0]->lexinfo;
 		root->children[1]->typenm = root->children[0]->typenm;
+		symbol* sym = lookup(root->children[1]->lexinfo);
+		sym->lexinfo = root->children[0]->lexinfo;
+		//root->attr |= sym->attr;
 	}
 	cout << "exit array" << endl;
 }
 
 
+void new_type (astree* root) {
+	if (root == NULL) return;
+
+}
+
+
 void type_id (astree* root) {
-	
+	cout << endl << "enter typeid" << endl;
 	if  (root == NULL) return;
 	root->typenm = root->lexinfo;
 	root->oftype = root->lexinfo;
@@ -617,7 +642,27 @@ void type_id (astree* root) {
     		root->attr.set(ATTR_struct, true);
     	}
     }else if (root->children.size() == 1) {
-        if (lookup_struct(root->lexinfo)){
+    	cout << endl << "in new section" << endl;
+    	if (*(root->children[0]->lexinfo) == "new") {
+    		astree* child = root->children[0];
+    		symbol* sym = lookup_struct(root->lexinfo);
+    		//cout << endl << "here in new section" << endl;
+    		if (!sym | (sym && !sym->fields)) {
+    			cout << endl << "problem in error msg" << endl;
+    			errprintf ("%:%s: %d: error: '%s' not defined\n",
+            	included_filenames.back().c_str(),
+            	root->linenr,child->lexinfo->c_str());
+		    exit(1);
+    		}
+			cout << endl << "ass in new section" << endl;
+        	root->attr.set(ATTR_struct, true);
+        	root->attr.set(ATTR_vreg, true);
+        	root->typenm = root->lexinfo;
+        	root->oftype = root->lexinfo;
+        	sym->attr.set(ATTR_struct, true);
+        	sym->attr.set(ATTR_vreg, true);
+
+    	}else if (lookup_struct(root->lexinfo)){
         	
         	symbol* sym = lookup_struct(root->lexinfo);
         	root->attr.set(ATTR_struct, true);
@@ -696,7 +741,6 @@ void declid (astree* root) {
 
 // need dump_node funct
 void vardecl (astree* root) {
-	//printf("entered vardecl\n");
     if  (root == NULL) return;
     astree* grandchild;
     if (root->children.front()->attr[ATTR_array]) 
@@ -704,17 +748,13 @@ void vardecl (astree* root) {
     								->children.back();
     else grandchild = root->children.front()
     								->children.front();
-    //cout << "here" << endl;
+    cout << "here" << endl;
     if  (compat(root->children.front()->attr, 
     	root->children.back()->attr)) {
-    	///cout << "here1" << endl;
     	int type = idtype(root->children.back()->attr);
   		grandchild->attr.set(ATTR_variable, true);
-  		///cout << "here2" << endl;
   		symbol * sym = lookup(grandchild->lexinfo);
-  		//cout << "here3" << endl;
   		sym->attr.set(ATTR_variable, true);
-  		//cout << "here4" << endl;
   		sym->attr.set(type, true);
     }else{
     	errprintf ("%:%s: %d: error: invalid declaration : '%s'\n",
@@ -722,7 +762,6 @@ void vardecl (astree* root) {
             root->linenr, root->children.front()->lexinfo->c_str());
 		    exit(1);
     }
-    //printf("exit vardecl\n");
 }
 
 void ifelse_op(astree* root) {
@@ -757,6 +796,63 @@ void while_op(astree* root) {
 }
 
 
+
+void dot_op (astree* root) {
+	cout << endl << "enter dot op" << endl;
+	if  (root == NULL) return;
+	astree* obj = root->children[0];
+	astree* field = root->children[1];
+	symbol* objsym;
+	symbol* srct;
+	symbol* fieldsym;
+	if (!obj->attr[ATTR_struct]) {
+		errprintf ("%:%s: %d: error: required type struct, found type '%s'\n",
+              included_filenames.back().c_str(),
+              root->linenr, strtype(obj->attr).c_str());
+		exit(1);
+	}
+	cout << endl << "here in dot op" << endl;
+	if (obj->attr[ATTR_array]) {
+		cout << endl <<"shouldnt be here" << endl;
+		objsym = lookup(obj->children[0]->lexinfo);
+	}else objsym = lookup(obj->lexinfo);
+	cout << endl << objsym->lexinfo->c_str() << endl;
+	if (!objsym) {
+		errprintf ("%:%s: %d: error: undeclared identifier '%s'\n",
+              included_filenames.back().c_str(),
+              root->linenr, obj->lexinfo->c_str());
+		exit(1);
+	}
+	srct = lookup_struct(objsym->lexinfo);
+	if (!srct | (srct && !srct->fields)) {
+		errprintf ("%:%s: %d: error: undefined object '%s'\n",
+              included_filenames.back().c_str(),
+              root->linenr, obj->lexinfo->c_str());
+		exit(1);
+	}
+	fieldsym = lookup_field(srct->fields, field->lexinfo);
+	cout << endl << "just looked up fields " << endl; 
+	if (!fieldsym) {
+		errprintf ("%:%s: %d: error: field '%s'\n",
+              included_filenames.back().c_str(),
+              root->linenr, field->lexinfo->c_str());
+		exit(1);
+	}
+	/*const string* fieldtype;
+	for (auto kv : *(srct->fields)) {
+		if (kv.second == fieldsym) fieldtype = kv.first;
+	}*/
+	cout << endl << "field lexinfo " << endl;
+	root->attr |= root->children[0]->attr;
+	//root->attr |= fieldsym->attr;
+	if (fieldsym->attr[ATTR_struct]) {
+		root->typenm = fieldsym->lexinfo;
+		objsym->lexinfo = fieldsym->lexinfo;
+	}
+	
+	cout << endl << "exit dot op " << strattr(root).c_str() << endl;
+}
+
 // write print subtree function for error printing
 void equal_op (astree* root) {
 	if  (root == NULL) return;
@@ -773,10 +869,30 @@ void equal_op (astree* root) {
 	}
 	else{
 		right->attr.set(ATTR_vreg, true);
+		right->attr.set(ATTR_lval, false);
 	}
 		return;
 }
 
+
+void inequal_op (astree* root) {
+	if  (root == NULL) return;
+	astree* left = root->children.front();
+	attr_bitset lbits = get_attr(left);
+	astree* right = root->children.back();
+	attr_bitset rbits = get_attr(right);
+	if  ((attr_and(lbits, ATTR_int)) && 
+		(attr_and(rbits, ATTR_int))) {
+		root->attr.set(ATTR_bool, true);
+		root->attr.set(ATTR_vreg, true);
+	}else{
+		errprintf ("%:%s: %d: error: incompatible operands: '%s + %s'\n",
+              included_filenames.back().c_str(),
+              root->linenr, left->lexinfo->c_str(), 
+              right->lexinfo->c_str());
+		exit(1);
+	}
+}
 
 void plus_op (astree* root) {
 	if  (root == NULL) return;
@@ -1053,6 +1169,27 @@ func getfunc (int TOK_TYPE) {
 			break;
 		case (TOK_VOID):
 			foo = voidcon;
+			break;
+		case (TOK_LT):
+			foo = inequal_op;
+			break;
+		case (TOK_GT):
+			foo = inequal_op;
+			break;
+		case (TOK_LE):
+			foo = inequal_op;
+			break;
+		case (TOK_GE):
+			foo = inequal_op;
+			break;
+		case (TOK_EQ):
+			foo = inequal_op;
+			break;
+		case (TOK_NE):
+			foo = inequal_op;
+			break;
+		case ('.'):
+			foo = dot_op;
 			break;
 		case ('='):
 			foo = equal_op;
