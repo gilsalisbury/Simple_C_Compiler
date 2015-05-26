@@ -145,7 +145,7 @@ static void postorder (FILE* outfile, astree* root,
                              int depth) {
    if (root == NULL) return;
    if (root->symbol == TOK_BLOCK) enter_block();
-   if (root->symbol == TOK_STRUCT) enter_block();
+   if (root->symbol == TOK_STRUCT) enter_struct();
    if (root->symbol == TOK_FUNCTION) enter_block();
    if (root->symbol == TOK_PROTOTYPE) enter_block();
    

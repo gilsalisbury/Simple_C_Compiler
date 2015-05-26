@@ -1,29 +1,38 @@
-ROOT "" 0:0.000           
+ROOT "" 0:0.000             
 |  STRUCT "struct" 3:4.000        
 |  |  TYPEID "foo" 3:4.007       
 |  |  TYPEID "bar" 3:5.001       
 |  |  |  FIELD "z" 3:5.005       
-|  STRUCT "struct" 3:8.000       
+|  STRUCT "struct" 3:8.000        
 |  |  TYPEID "bar" 3:8.007       
-|  VARDECL "=" 3:9.008        
-|  |  ARRAY "[]" 3:9.003        
-|  |  |  TYPEID "bar" 3:9.000       
-|  |  |  DECLID "z" 3:9.006       
-|  |  NEWARRAY "new" 3:9.010        
-|  |  |  TYPEID "bar" 3:9.014       
-|  |  |  INTCON "43" 3:9.018       
-|  VARDECL "=" 3:10.008        
-|  |  ARRAY "[]" 3:10.003        
-|  |  |  TYPEID "foo" 3:10.000       
-|  |  |  DECLID "f" 3:10.006       
-|  |  NEWARRAY "new" 3:10.010        
-|  |  |  TYPEID "foo" 3:10.014       
-|  |  |  INTCON "42" 3:10.018       
-|  VARDECL "=" 3:12.006        
-|  |  TYPEID "bar" 3:12.000       
-|  |  |  DECLID "b" 3:12.004       
-|  |  '.' "." 3:12.012        
-|  |  |  INDEX "[" 3:12.009        
-|  |  |  |  IDENT "f" 3:12.008       
-|  |  |  |  INTCON "3" 3:12.010       
-|  |  |  FIELD "z" 3:12.013       
+|  |  TYPEID "foo" 3:9.001       
+|  |  |  FIELD "x" 3:9.005       
+|  VARDECL "=" 3:11.008        
+|  |  ARRAY "[]" 3:11.003        
+|  |  |  TYPEID "bar" 3:11.000       
+|  |  |  DECLID "z" 3:11.006       
+|  |  NEWARRAY "new" 3:11.010        
+|  |  |  TYPEID "bar" 3:11.014       
+|  |  |  INTCON "43" 3:11.018       
+|  VARDECL "=" 3:12.008        
+|  |  ARRAY "[]" 3:12.003        
+|  |  |  TYPEID "foo" 3:12.000       
+|  |  |  DECLID "f" 3:12.006       
+|  |  NEWARRAY "new" 3:12.010        
+|  |  |  TYPEID "foo" 3:12.014       
+|  |  |  INTCON "42" 3:12.018       
+|  VARDECL "=" 3:15.006        
+|  |  TYPEID "bar" 3:15.000       
+|  |  |  DECLID "b" 3:15.004       
+|  |  TYPEID "bar" 3:15.012       
+|  |  |  NEW "new" 3:15.008       
+|  VARDECL "=" 3:18.006        
+|  |  TYPEID "foo" 3:18.000       
+|  |  |  DECLID "k" 3:18.004       
+|  |  INDEX "[" 3:18.009        
+|  |  |  IDENT "f" 3:18.008       
+|  |  |  INTCON "2" 3:18.010       
+|  VARDECL "=" 3:20.006        
+|  |  TYPEID "foo" 3:20.000       
+|  |  |  DECLID "c" 3:20.004       
+|  |  IDENT "b" 3:20.008       

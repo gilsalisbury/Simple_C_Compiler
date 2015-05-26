@@ -239,16 +239,19 @@ void enter_block () {
 }
 
 
+void enter_struct () {
+	(*stack).push_back(new symbol_table());
+	struct_block = true;
+}
+
+
 void block (astree* root) {
 	if  (root == NULL) return;
-	if  (struct_block) return;
-
 	symbol_table* table = stack->back();
     gc->push_back(table);
 	stack->pop_back();
 	block_count->pop_back();
 	next_block -= 1;
-	//printf("\nExiting block %d\n", next_block);
 }
 
 
@@ -590,7 +593,7 @@ void paramlist (astree* root) {
 // print entire subtre
 void struct_op (astree* root) {
 	if  (root == NULL) return;
-	if  (next_block != 2) {
+	if  (next_block != 1) {
 		errprintf ("%:%s: %d: error: nested struct definitions not allowed '%s'\n",
             included_filenames.back().c_str(),
             root->linenr, root->lexinfo->c_str());
@@ -621,8 +624,9 @@ void struct_op (astree* root) {
     sym->lexinfo = child->lexinfo;
     sym->fields = table;
     stack->pop_back();
-    block_count->pop_back();
-    --next_block;
+    struct_block = false;
+    //block_count->pop_back();
+    //--next_block;
     //cout << "EXIT STRUCT" << endl;
 	return;
 }
@@ -640,6 +644,13 @@ void index_op (astree* root) {
 	root->attr |= root->children[0]->attr;
 	root->attr.set(ATTR_vreg, true);
 	root->attr.set(ATTR_index, true);
+	if  (!root->children[0]->attr[ATTR_array]) {
+		errprintf ("%:%s: %d: error: indexing non-array "
+			"type variable '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, root->children[0]->lexinfo->c_str());
+		    exit(1);
+	}
 	if  (root->children[0]->attr[ATTR_struct]) {
 		symbol* sym = lookup(root->children[0]->lexinfo);
 		if(!sym) {
@@ -659,6 +670,7 @@ void index_op (astree* root) {
 	}
 	root->attr.set(ATTR_lval, false);
 	root->attr.set(ATTR_variable, false);
+	root->attr.set(ATTR_array, false);
 }
 
 void newarray_op (astree* root) {
@@ -717,6 +729,7 @@ void array_op (astree* root) {
 		sym = lookup(root->children[1]->lexinfo);
 		sym->lexinfo = root->children[0]->lexinfo;
 		sym->attr.set(ATTR_struct, true);
+		sym->attr.set(ATTR_array, true);
 		//root->attr |= sym->attr;
 	}
 	cout << "exit array" << endl;
@@ -762,12 +775,6 @@ void type_id (astree* root) {
         	sym->attr.set(ATTR_vreg, true);
 
     	}else if (lookup_struct(root->lexinfo)){
-        	
-        	if (root->children[0]->attr[ATTR_field]) {
-
-        	}
-
-
 
         	symbol* sym = lookup_struct(root->lexinfo);
         	root->attr.set(ATTR_struct, true);
@@ -778,7 +785,6 @@ void type_id (astree* root) {
         	sym = lookup(root->children[0]->lexinfo);
         	sym->attr.set(ATTR_struct, true);
         	sym->lexinfo = root->lexinfo;
-
         	
         }else{
 
@@ -801,20 +807,20 @@ void type_id (astree* root) {
 
 
 void field (astree* root) {
-	
 	if  (root == NULL) return;
 	if  (root->symbol != TOK_FIELD) return;
 	root->attr.set(ATTR_field, true);
 	root->typenm = root->lexinfo;
-	symbol* sym = new symbol (root->filenr, 
-    	root->linenr, root->offset, block_count->back());
-    if (!insert(root->lexinfo, sym)) {
-    	errprintf ("%:%s: %d: error: redeclartion of field: '%s'\n",
-            included_filenames.back().c_str(),
-            root->linenr, root->lexinfo->c_str());
-		    exit(1);
+	if (struct_block) {
+		symbol* sym = new symbol (root->filenr, 
+    		root->linenr, root->offset, block_count->back());
+    	if (!insert(root->lexinfo, sym)) {
+    		errprintf ("%:%s: %d: error: redeclartion of field: '%s'\n"
+            	,included_filenames.back().c_str(),
+            	root->linenr, root->lexinfo->c_str());
+		    	exit(1);
+    	}	
     }
-    
     return;
 }
 
@@ -866,15 +872,25 @@ void vardecl (astree* root) {
     	root->children.back()->attr)) {
     	if ((root->children.front()->attr[ATTR_struct]) &&
     		(root->children.back()->attr[ATTR_struct])) {
+    		cout << "BOTH STRUCTS" << endl;
     		symbol* type1 = lookup_struct(root->children[0]->typenm);
     		symbol* type2 = lookup_struct(root->children[1]->typenm);
     		if(!type1 | !type2 | (type1 && !type1->fields) | 
     							 (type2 && !type2->fields)) {
-    			errprintf ("%:%s: %d: error: invalid declaration : '%s'\n",
+    			errprintf ("%:%s: %d: error: invalid varibable"
+    			" declaration : '%s'\n",
             	included_filenames.back().c_str(),
-            	root->linenr, root->children.front()->lexinfo->c_str());
+            	root->linenr,root->children.front()->lexinfo->c_str());
+		    	exit(1);
+    		}if (type1 != type2) {
+    			errprintf ("%:%s: %d: error: incompatible"
+    			" types: '%s' and '%s'\n",
+            	included_filenames.back().c_str(),
+            	root->linenr,type1->lexinfo->c_str(),
+            	type2->lexinfo->c_str());
 		    	exit(1);
     		}
+    		cout << "type1 =" << type1->lexinfo->c_str() << "type2 =" << type2->lexinfo->c_str() << endl;
 
     	}else {
     		int type = idtype(root->children.back()->attr);
@@ -944,9 +960,13 @@ void dot_op (astree* root) {
 	}
 	cout << endl << "here in dot op" << endl;
 	if (obj->attr[ATTR_array]) {
-		cout << endl <<"shouldnt be here" << endl;
-		objsym = lookup(obj->children[0]->lexinfo);
-	}else objsym = lookup(obj->lexinfo);
+		errprintf ("%:%s: %d: error: array type has no field"
+			" reference\n",
+              included_filenames.back().c_str(),
+              root->linenr);
+		exit(1);
+	}else if(obj->attr[ATTR_index]) objsym = lookup(obj->children[0]->lexinfo);
+	else objsym = lookup(obj->lexinfo);
 	cout << endl << objsym->lexinfo->c_str() << endl;
 	if (!objsym) {
 		errprintf ("%:%s: %d: error: undeclared identifier '%s'\n",
@@ -969,12 +989,8 @@ void dot_op (astree* root) {
               root->linenr, field->lexinfo->c_str());
 		exit(1);
 	}
-	/*const string* fieldtype;
-	for (auto kv : *(srct->fields)) {
-		if (kv.second == fieldsym) fieldtype = kv.first;
-	}*/
 	cout << endl << "field lexinfo " << endl;
-	root->attr |= root->children[0]->attr;
+	root->attr |= fieldsym->attr;
 	//root->attr |= fieldsym->attr;
 	if (fieldsym->attr[ATTR_struct]) {
 		root->typenm = fieldsym->lexinfo;
@@ -997,8 +1013,28 @@ void equal_op (astree* root) {
               root->linenr, strtype(right->attr).c_str(), 
               strtype(left->attr).c_str());
 		exit(1);
-	}
-	else{
+	}else if ((root->children.front()->attr[ATTR_struct]) &&
+    	(root->children.back()->attr[ATTR_struct])) {
+    	//cout << "BOTH STRUCTS" << endl;
+    	symbol* type1 = lookup_struct(root->children[0]->typenm);
+    	symbol* type2 = lookup_struct(root->children[1]->typenm);
+    	if(!type1 | !type2 | (type1 && !type1->fields) | 
+    							 (type2 && !type2->fields)) {
+    		errprintf ("%:%s: %d: error: invalid varibable"
+    		" declaration : '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr,root->children.front()->lexinfo->c_str());
+		    exit(1);
+    	}if (type1 != type2) {
+    		errprintf ("%:%s: %d: error: incompatible"
+    		" types: '%s' and '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr,type1->lexinfo->c_str(),
+            type2->lexinfo->c_str());
+		    exit(1);
+    	}
+    	cout << "type1 =" << type1->lexinfo->c_str() << "type2 =" << type2->lexinfo->c_str() << endl;
+	}else{
 		right->attr.set(ATTR_vreg, true);
 		right->attr.set(ATTR_lval, false);
 	}
