@@ -1,65 +1,29 @@
-ROOT "" 0:0.000        
-|  STRUCT "struct" 3:1.000         
-|  |  TYPEID "node" 3:1.007       
-|  |  INT "int" 3:1.014       
-|  |  |  FIELD "foo" 3:1.018       
-|  |  TYPEID "node" 3:1.023       
-|  |  |  FIELD "link" 3:1.028       
-|  FUNCTION "" 3:3.000         
-|  |  TYPEID "node" 3:3.000       
-|  |  |  DECLID "func" 3:3.005       
-|  |  PARAMLIST "(" 3:3.010        
-|  |  |  TYPEID "node" 3:3.011       
-|  |  |  |  DECLID "head" 3:3.016       
-|  |  |  INT "int" 3:3.022       
-|  |  |  |  DECLID "length" 3:3.026       
-|  |  BLOCK "{" 3:3.034          
-|  |  |  VARDECL "=" 3:5.010        
-|  |  |  |  INT "int" 3:5.004       
-|  |  |  |  |  DECLID "a" 3:5.008       
-|  |  |  |  INTCON "0" 3:5.012       
-|  |  |  VARDECL "=" 3:6.013        
-|  |  |  |  STRING "string" 3:6.004       
-|  |  |  |  |  DECLID "b" 3:6.011       
-|  |  |  |  STRINGCON """" 3:6.015       
-|  |  |  VARDECL "=" 3:7.011        
-|  |  |  |  TYPEID "node" 3:7.004       
-|  |  |  |  |  DECLID "c" 3:7.009       
-|  |  |  |  TYPEID "node" 3:7.017       
-|  |  |  |  |  NEW "new" 3:7.013       
-|  |  |  IFELSE "if" 3:8.004         
-|  |  |  |  LT "<" 3:8.010        
-|  |  |  |  |  IDENT "a" 3:8.008       
-|  |  |  |  |  INTCON "3" 3:8.012       
-|  |  |  |  BLOCK "{" 3:8.015         
-|  |  |  |  |  VARDECL "=" 3:9.011        
-|  |  |  |  |  |  INT "int" 3:9.005       
-|  |  |  |  |  |  |  DECLID "d" 3:9.009       
-|  |  |  |  |  |  INTCON "8" 3:9.013       
-|  |  |  |  |  '=' "=" 3:10.007        
-|  |  |  |  |  |  IDENT "a" 3:10.005       
-|  |  |  |  |  |  IDENT "length" 3:10.009       
-|  |  |  |  |  '=' "=" 3:11.007        
-|  |  |  |  |  |  IDENT "c" 3:11.005       
-|  |  |  |  |  |  '.' "." 3:11.010        
-|  |  |  |  |  |  |  IDENT "c" 3:11.009       
-|  |  |  |  |  |  |  FIELD "link" 3:11.011       
-|  |  |  |  BLOCK "{" 3:14.009        
-|  |  |  |  |  VARDECL "=" 3:15.014        
-|  |  |  |  |  |  STRING "string" 3:15.005       
-|  |  |  |  |  |  |  DECLID "e" 3:15.012       
-|  |  |  |  |  |  STRINGCON """" 3:15.016       
-|  |  |  |  |  IFELSE "if" 3:17.008         
-|  |  |  |  |  |  EQ "==" 3:17.014        
-|  |  |  |  |  |  |  INTCON "0" 3:17.012       
-|  |  |  |  |  |  |  INTCON "0" 3:17.017       
-|  |  |  |  |  |  BLOCK "{" 3:17.020       
-|  |  |  |  |  |  |  VARDECL "=" 3:18.014        
-|  |  |  |  |  |  |  |  INT "int" 3:18.008       
-|  |  |  |  |  |  |  |  |  DECLID "f" 3:18.012       
-|  |  |  |  |  |  |  |  INTCON "8" 3:18.016       
-|  |  |  |  |  |  BLOCK "{" 3:19.013       
-|  |  |  |  |  |  |  VARDECL "=" 3:20.014        
-|  |  |  |  |  |  |  |  INT "int" 3:20.008       
-|  |  |  |  |  |  |  |  |  DECLID "g" 3:20.012       
-|  |  |  |  |  |  |  |  INTCON "9" 3:20.016       
+ROOT "" 0:0.000           
+|  STRUCT "struct" 3:4.000        
+|  |  TYPEID "foo" 3:4.007       
+|  |  TYPEID "bar" 3:5.001       
+|  |  |  FIELD "z" 3:5.005       
+|  STRUCT "struct" 3:8.000       
+|  |  TYPEID "bar" 3:8.007       
+|  VARDECL "=" 3:9.008        
+|  |  ARRAY "[]" 3:9.003        
+|  |  |  TYPEID "bar" 3:9.000       
+|  |  |  DECLID "z" 3:9.006       
+|  |  NEWARRAY "new" 3:9.010        
+|  |  |  TYPEID "bar" 3:9.014       
+|  |  |  INTCON "43" 3:9.018       
+|  VARDECL "=" 3:10.008        
+|  |  ARRAY "[]" 3:10.003        
+|  |  |  TYPEID "foo" 3:10.000       
+|  |  |  DECLID "f" 3:10.006       
+|  |  NEWARRAY "new" 3:10.010        
+|  |  |  TYPEID "foo" 3:10.014       
+|  |  |  INTCON "42" 3:10.018       
+|  VARDECL "=" 3:12.006        
+|  |  TYPEID "bar" 3:12.000       
+|  |  |  DECLID "b" 3:12.004       
+|  |  '.' "." 3:12.012        
+|  |  |  INDEX "[" 3:12.009        
+|  |  |  |  IDENT "f" 3:12.008       
+|  |  |  |  INTCON "3" 3:12.010       
+|  |  |  FIELD "z" 3:12.013       
