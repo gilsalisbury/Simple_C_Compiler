@@ -16,7 +16,7 @@ int next_block = 1;
 
 vector<int>* block_count = new vector<int>;
 symbol_stack* gc = new symbol_stack();
-symbol_stack* func_stack = new symbol_stack();
+
 symbol_stack* stack = new symbol_stack();
 symbol_stack* struct_stack = new symbol_stack();
 vector<string> included_filenames;
@@ -230,6 +230,7 @@ static attr_bitset get_attr(astree* root) {
 }
 
 
+
 void enter_block () {
 	//printf("\nPushing symbol table %d\n", next_block);
 	next_block += 1;
@@ -276,7 +277,7 @@ void call_op(astree* root) {
 	cout << "made it here" << endl;
 	for (size_t i = 0; i< root->children.size()-1; ++i) {
 		astree* param = root->children[i+1];
-		if (param->attr[ATTR_array]) param = param->children[1];
+		
 		if (param->attr[ATTR_index]) {
 			cout << "ATTR INDEX !!!!!!" <<endl;
 			param = param->children[0];
@@ -364,7 +365,7 @@ void proto_op (astree* root) {
 	}
 	// Initalize new function symbol 	
 	func = new symbol (root->filenr, 
-    	    root->linenr, root->offset, 0);
+    	    root->linenr, root->offset, block_count->back()-1);
 	if (grandchild->attr[ATTR_struct]) {
 			//getname for array case
 			symbol* strct = lookup_struct(grandchild->typenm);
@@ -384,7 +385,6 @@ void proto_op (astree* root) {
     func->attr |= grandchild->attr;
     astree* paramlist = root->children[1];
     grandchild->attr.set(ATTR_lval, false);
-    grandchild->attr.set(ATTR_variable, false);
     func->attr.set(ATTR_lval, false);
     func->attr.set(ATTR_variable, false);
     // push params into function symbol's paramlist
@@ -405,6 +405,7 @@ void proto_op (astree* root) {
     --next_block;
     // insert the function symbol into stack error if already there.
 	if(insert(grandchild->lexinfo, func)) {
+		grandchild->blocknr = block_count->back();
 		return;
 	}else{
 		errprintf ("%:%s: %d: error: prototype redefines "
@@ -513,7 +514,7 @@ void func_op (astree* root) {
 	}else{
 
 		func = new symbol (root->filenr, 
-    	    root->linenr, root->offset, 0);
+    	    root->linenr, root->offset, block_count->back()-1);
 		if (grandchild->attr[ATTR_struct]) {
 			//getname for array case
 			symbol* strct = lookup_struct(grandchild->typenm);
@@ -528,6 +529,7 @@ void func_op (astree* root) {
 		func->parameters = new vector<symbol*>;
 		grandchild->attr |= root->children[0]->attr;
 		grandchild->attr.set(ATTR_function, true);
+
 		func->attr |= grandchild->attr;
 		astree* paramlist = root->children.at(1);
 	    for (size_t i = 0; i < paramlist->children.size(); ++i) {   
@@ -549,9 +551,10 @@ void func_op (astree* root) {
         		root->linenr, root->lexinfo->c_str());
 			exit(1);
     	}
+    	grandchild->blocknr = block_count->back();
 
-    root->attr.set(ATTR_lval, false);
-    root->attr.set(ATTR_variable, false);
+    	root->attr.set(ATTR_lval, false);
+    	root->attr.set(ATTR_variable, false);
 	}
 
 }
@@ -748,6 +751,7 @@ void type_id (astree* root) {
     	    root->linenr, root->offset, block_count->back());
     	sym->attr.set(ATTR_struct, true);
     	sym->lexinfo = root->lexinfo;
+    	root->blocknr = block_count->back();
     	bool insert = insert_struct(root->lexinfo, sym);
     	sym = lookup_struct(root->lexinfo);
 		if(insert) {
@@ -795,6 +799,7 @@ void type_id (astree* root) {
         	root->children[0]->attr.set(ATTR_struct, true);
         	root->children[0]->typenm = root->lexinfo;
         	root->children[0]->oftype = root->lexinfo;
+        	root->children[0]->blocknr = block_count->back();
         	insert_struct(root->lexinfo, sym);
         	sym = lookup(root->children[0]->lexinfo);
         	sym->attr.set(ATTR_struct, true);
@@ -819,7 +824,8 @@ void field (astree* root) {
             	,included_filenames.back().c_str(),
             	root->linenr, root->lexinfo->c_str());
 		    	exit(1);
-    	}	
+    	}
+    	root->blocknr = block_count->back();
     }
     return;
 }
@@ -838,6 +844,7 @@ void declid (astree* root) {
     	if(insert(root->lexinfo, sym)) {
     		//cout << "inserted: " << root->lexinfo->c_str() << endl;
     		root->attr.set(ATTR_lval, true);
+    		root->blocknr = block_count->back();
     		//cout << "exit declid" << endl << endl;
     		return;
     	}else {
@@ -952,6 +959,7 @@ void dot_op (astree* root) {
 	symbol* objsym;
 	symbol* srct;
 	symbol* fieldsym;
+	root->attr.set(ATTR_vaddr, true);
 	if (!obj->attr[ATTR_struct]) {
 		errprintf ("%:%s: %d: error: required type struct, found type '%s'\n",
               included_filenames.back().c_str(),
@@ -1041,25 +1049,72 @@ void equal_op (astree* root) {
 		return;
 }
 
-
-void inequal_op (astree* root) {
+void inequality_op (astree* root) {
 	if  (root == NULL) return;
 	astree* left = root->children.front();
 	attr_bitset lbits = get_attr(left);
 	astree* right = root->children.back();
 	attr_bitset rbits = get_attr(right);
-	if  ((attr_and(lbits, ATTR_int)) && 
-		(attr_and(rbits, ATTR_int))) {
-		root->attr.set(ATTR_bool, true);
-		root->attr.set(ATTR_vreg, true);
-	}else{
-		errprintf ("%:%s: %d: error: incompatible operands: '%s + %s'\n",
+	if (lbits[ATTR_array] != rbits[ATTR_array]) {
+		errprintf ("%:%s: %d: error: array type compared "
+				"with non-array type\n",
+            	included_filenames.back().c_str(),
+            	root->linenr);
+		 exit(1);
+	}
+	if  (!compat(lbits, rbits)) {
+		errprintf ("%:%s: %d: error: incompatible "
+			  "assignment: type '%s' assigned to type '%s'\n",
               included_filenames.back().c_str(),
-              root->linenr, left->lexinfo->c_str(), 
-              right->lexinfo->c_str());
+              root->linenr, strtype(right->attr).c_str(), 
+              strtype(left->attr).c_str());
+		exit(1);
+	}else if ((root->children.front()->attr[ATTR_struct]) &&
+    	(root->children.back()->attr[ATTR_struct])) {
+    	//cout << "BOTH STRUCTS" << endl;
+    	symbol* type1 = lookup_struct(root->children[0]->typenm);
+    	symbol* type2 = lookup_struct(root->children[1]->typenm);
+    	if(!type1 | !type2 | (type1 && !type1->fields) | 
+    							 (type2 && !type2->fields)) {
+    		errprintf ("%:%s: %d: error: invalid varibable"
+    		" declaration : '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr,root->children.front()->lexinfo->c_str());
+		    exit(1);
+    	}if (type1 != type2) {
+    		errprintf ("%:%s: %d: error: incomparable"
+    		" types: '%s' and '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr,type1->lexinfo->c_str(),
+            type2->lexinfo->c_str());
+		    exit(1);
+    	}
+    	cout << "type1 =" << type1->lexinfo->c_str() << "type2 =" 
+    	<< type2->lexinfo->c_str() << endl;
+	}else{
+		
+	}
+	root->attr.reset();
+	root->attr.set(ATTR_bool, true);
+	root->attr.set(ATTR_vreg, true);
+	return;
+}
+
+
+void sign_op (astree* root) {
+	if  (root == NULL) return;
+	if  ((root->children[0]->attr[ATTR_int])) {
+		root->attr.set(ATTR_int, true);
+		root->attr.set(ATTR_vreg, true);
+    }else{
+		errprintf ("%:%s: %d: error: required int: '-%s'\n",
+              included_filenames.back().c_str(),
+              root->linenr,
+              root->children[0]->lexinfo->c_str());
 		exit(1);
 	}
 }
+
 
 void plus_op (astree* root) {
 	if  (root == NULL) return;
@@ -1178,7 +1233,8 @@ void stringdec (astree* root) {
 
 void booldec (astree* root) {
 	if  (root == NULL) return;
-	if  ((root->symbol == TOK_FALSE) | (root->symbol == TOK_TRUE)) {
+	if  ((root->symbol == TOK_FALSE) | (root->symbol == TOK_TRUE) 
+		| (root->symbol == TOK_BOOL)) {
 		root->attr.set(ATTR_bool, true);
 		if(root->children.size() == 0) return;
 		root->children.front()->attr.set(ATTR_bool, true);
@@ -1353,22 +1409,28 @@ func getfunc (int TOK_TYPE) {
 			foo = voidcon;
 			break;
 		case (TOK_LT):
-			foo = inequal_op;
+			foo = inequality_op;
 			break;
 		case (TOK_GT):
-			foo = inequal_op;
+			foo = inequality_op;
 			break;
 		case (TOK_LE):
-			foo = inequal_op;
+			foo = inequality_op;
 			break;
 		case (TOK_GE):
-			foo = inequal_op;
+			foo = inequality_op;
 			break;
 		case (TOK_EQ):
-			foo = inequal_op;
+			foo = inequality_op;
 			break;
 		case (TOK_NE):
-			foo = inequal_op;
+			foo = inequality_op;
+			break;
+		case (TOK_NEG):
+			foo = sign_op;
+			break;
+		case (TOK_POS):
+			foo = sign_op;
 			break;
 		case ('.'):
 			foo = dot_op;

@@ -24,6 +24,7 @@ using attr_bitset = bitset<ATTR_bitset_size>;
 struct astree {
    const string* typenm = NULL;
    const string* oftype = NULL;
+   int blocknr = 0;
    int symbol;               // token code
    size_t filenr;            // index into filename stack
    size_t linenr;            // line number from source code

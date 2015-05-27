@@ -164,6 +164,7 @@ static void postorder (FILE* outfile, astree* root,
 }
 
 
+
 static void preorder (FILE* outfile, astree* root,
                              int depth) {
    if (root == NULL) return;
@@ -177,6 +178,86 @@ static void preorder (FILE* outfile, astree* root,
         ++child) {
       preorder (outfile, root->children[child],
                        depth + 1);
+   }
+}
+
+
+
+static bool sym_dump_node (FILE* outfile, astree* node) {
+   const char *tname = get_yytname (node->symbol);
+   if (strstr (tname, "TOK_") == tname) tname += 4;
+   
+   fprintf (outfile, "%s (%ld:%ld.%0ld) {%d} %s",
+            node->lexinfo->c_str(),
+            node->filenr, node->linenr, node->offset,
+            node->blocknr, strattr(node).c_str());
+   bool need_space = false;
+   for (size_t child = 0; child < node->children.size();
+        ++child) {
+      if (need_space) fprintf (outfile, " ");
+      need_space = true;
+   }
+   fprintf (outfile, "\n");
+   return true;
+}
+
+
+
+
+static void sym_preorder (FILE* outfile, astree* node, int depth) {
+  if (node == NULL) return;
+    
+  if ((node->symbol == TOK_STRUCT) | (node->symbol == TOK_VARDECL) |
+      (node->symbol == TOK_PROTOTYPE)|(node->symbol == TOK_FUNCTION)) {
+
+
+
+      //cout << endl;
+      if (node->symbol == TOK_STRUCT) {
+          for(int i=0; i<depth; i++) {
+              fprintf(outfile, "  ");
+          }
+          sym_dump_node(stdout, node->children[0]);
+          for (size_t child = 1; child < node->children.size();
+              ++child) {
+              fprintf(outfile, "  ");
+              sym_dump_node (outfile, node->children[child]->children[0]);
+          }
+          if (depth == 0)  fprintf(outfile, "\n");
+      }else if ((node->symbol == TOK_FUNCTION) | 
+                (node->symbol == TOK_PROTOTYPE)) {
+          for(int i=0; i<depth; i++) {
+              fprintf(outfile, "  ");
+          }
+          if (node->children[0]->symbol == TOK_ARRAY) 
+              sym_dump_node(stdout, node->children[0]->children[1]);
+          else sym_dump_node(stdout, node->children[0]->children[0]);
+          for (size_t child = 0; child < node->children[1]->children.size();
+              ++child) {
+              astree* param = node->children[1]->children[child];
+              if (param->attr[ATTR_array]) param = param->children[1];
+              else param = param->children[0];
+              fprintf(outfile, "  ");
+              sym_dump_node (outfile, param);
+          }
+          if (depth == 0)  fprintf(outfile, "\n");
+      }else if (node->symbol == TOK_VARDECL) {
+          for(int i=0; i<depth; i++) {
+              fprintf(outfile, "  ");
+          }
+          //if (depth == 0)  fprintf(outfile, "\n");
+          if (node->children[0]->symbol == TOK_ARRAY) 
+              sym_dump_node(stdout, node->children[0]->children[1]);
+          else sym_dump_node(stdout, node->children[0]->children[0]);
+
+
+      }
+  }
+   //sym_dump_node (stdout, root);
+   //fprintf (outfile, "\n");
+   for (size_t child = 0; child < node->children.size();
+        ++child) {
+      sym_preorder (outfile, node->children[child], depth+1);
    }
 }
 
@@ -200,7 +281,9 @@ void type_ast (FILE* outfile, astree* root) {
    printf("\n\n\n");
    postorder (outfile, root, 0);
    printf("\n\n\n");
-   preorder (outfile, root, 0);
+   preorder (outfile, root, -1);
+   printf("\n\n\n");
+   sym_preorder (outfile, root, -1);
    fflush (NULL);
 }
 

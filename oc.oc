@@ -1,20 +1,15 @@
 
 
 
-struct foo {
-	bar z;
-}
 
-struct bar {
-	foo x;
-}
-bar[] z =  new bar[43];
-foo[] f =  new foo[42];
+struct foo {}
 
-// error
-bar b = new bar();
+struct bar {}
 
-// error
-foo k = f[2];
+foo f = new foo();
+bar[] b = new bar[4];
 
-foo c = b;
+
+bar newbar (bar[] b, int z);
+
+bar w = newbar(b,  32);
