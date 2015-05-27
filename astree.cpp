@@ -15,6 +15,7 @@
 #include "lyutils.h"
 
 
+
 astree::astree (int symbol, int filenr, int linenr,
                 int offset, const char* clexinfo):
         symbol (symbol), filenr (filenr), linenr (linenr),
@@ -146,7 +147,7 @@ static void postorder (FILE* outfile, astree* root,
    if (root == NULL) return;
    if (root->symbol == TOK_BLOCK) enter_block();
    if (root->symbol == TOK_STRUCT) enter_struct();
-   if (root->symbol == TOK_FUNCTION) enter_block();
+   if (root->symbol == TOK_FUNCTION) enter_func();
    if (root->symbol == TOK_PROTOTYPE) enter_block();
    
    for (size_t child = 0; child < root->children.size();
@@ -217,7 +218,7 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
           for(int i=0; i<depth; i++) {
               fprintf(outfile, "  ");
           }
-          sym_dump_node(stdout, node->children[0]);
+          sym_dump_node(outfile, node->children[0]);
           for (size_t child = 1; child < node->children.size();
               ++child) {
               fprintf(outfile, "  ");
@@ -230,8 +231,8 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
               fprintf(outfile, "  ");
           }
           if (node->children[0]->symbol == TOK_ARRAY) 
-              sym_dump_node(stdout, node->children[0]->children[1]);
-          else sym_dump_node(stdout, node->children[0]->children[0]);
+              sym_dump_node(outfile, node->children[0]->children[1]);
+          else sym_dump_node(outfile, node->children[0]->children[0]);
           for (size_t child = 0; child < node->children[1]->children.size();
               ++child) {
               astree* param = node->children[1]->children[child];
@@ -240,6 +241,7 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
               fprintf(outfile, "  ");
               sym_dump_node (outfile, param);
           }
+          --depth;
           if (depth == 0)  fprintf(outfile, "\n");
       }else if (node->symbol == TOK_VARDECL) {
           for(int i=0; i<depth; i++) {
@@ -247,14 +249,12 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
           }
           //if (depth == 0)  fprintf(outfile, "\n");
           if (node->children[0]->symbol == TOK_ARRAY) 
-              sym_dump_node(stdout, node->children[0]->children[1]);
-          else sym_dump_node(stdout, node->children[0]->children[0]);
+              sym_dump_node(outfile, node->children[0]->children[1]);
+          else sym_dump_node(outfile, node->children[0]->children[0]);
 
 
       }
   }
-   //sym_dump_node (stdout, root);
-   //fprintf (outfile, "\n");
    for (size_t child = 0; child < node->children.size();
         ++child) {
       sym_preorder (outfile, node->children[child], depth+1);
@@ -281,9 +281,9 @@ void type_ast (FILE* outfile, astree* root) {
    printf("\n\n\n");
    postorder (outfile, root, 0);
    printf("\n\n\n");
-   preorder (outfile, root, -1);
+   preorder (stdout, root, -1);
    printf("\n\n\n");
-   sym_preorder (outfile, root, -1);
+   sym_preorder (stdout, root, -1);
    fflush (NULL);
 }
 

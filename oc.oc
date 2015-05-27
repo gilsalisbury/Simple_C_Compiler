@@ -1,15 +1,19 @@
+struct node { int foo; node link; }   
 
+node func (node head, int length) { 
 
+   int a = 0; string b = ""; node c = new node(); 
 
+   if (a < 3) { int d = 8; a = length; c = c.link; } 
 
-struct foo {}
+         else { string e = "";    
 
-struct bar {}
+                if (0 == 0) { int f = 8; } 
 
-foo f = new foo();
-bar[] b = new bar[4];
+                       else { int g = 9; } 
 
+              } 
 
-bar newbar (bar[] b, int z);
+}
 
-bar w = newbar(b,  32);
+node h = func (null, 10);

@@ -42,6 +42,7 @@ void vardecl_type(astree* root);
 func getfunc(int TOK_TYPE);
 void enter_block ();
 void enter_struct ();
+void enter_func ();
 
 
 #endif

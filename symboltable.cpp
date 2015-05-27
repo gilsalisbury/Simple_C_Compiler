@@ -4,15 +4,16 @@
 #include "lyutils.h"
 
 vector<string> attr_name 
-	{  "void", "bool", "char", "int", "null",
+    {  "void", "bool", "char", "int", "null",
        "string", "struct", "array", "function",
        "variable", "field", "typeid", "param",
        "lval", "const", "vreg", "vaddr", "prototype",
        "index", "bitset_size",
-	};
+    };
 
 int blocknr = 0;
 int next_block = 1;
+bool infunc = false;
 
 vector<int>* block_count = new vector<int>;
 symbol_stack* gc = new symbol_stack();
@@ -23,31 +24,31 @@ vector<string> included_filenames;
 bool struct_block = false;
 
 symbol::symbol ( size_t filenr, size_t linenr, size_t offset,
-    	size_t blocknr ) :
-		filenr (filenr), linenr (linenr), offset (offset),
-		blocknr (blocknr) {
-	DEBUGF ('f', "symbol %p->{%d:%d.%d: }\n",
+        size_t blocknr ) :
+        filenr (filenr), linenr (linenr), offset (offset),
+        blocknr (blocknr) {
+    DEBUGF ('f', "symbol %p->{%d:%d.%d: }\n",
         (void*) this, filenr, linenr, offset);
 }
 
 void init_symbol_table () {
-	block_count->push_back(blocknr);
-	(*stack).push_back (new symbol_table ());
-	(*struct_stack).push_back (new symbol_table ());
+    block_count->push_back(blocknr);
+    (*stack).push_back (new symbol_table ());
+    (*struct_stack).push_back (new symbol_table ());
 }
 
 symbol* lookup (const string* s) {
-	symbol* sym;
-	auto itor = (*stack).rbegin ();
-	while(itor != (*stack).rend()) {
-		if((*itor) == NULL) continue;
-		const auto& e = (*itor)->find (s);
-		if (e != (*(itor++))->end()) {
-			sym = e->second;
-			break;
-		}else sym = NULL;
-	}
-	return sym;
+    symbol* sym;
+    auto itor = (*stack).rbegin ();
+    while(itor != (*stack).rend()) {
+        if((*itor) == NULL) continue;
+        const auto& e = (*itor)->find (s);
+        if (e != (*(itor++))->end()) {
+            sym = e->second;
+            break;
+        }else sym = NULL;
+    }
+    return sym;
 }
 
 
@@ -232,13 +233,24 @@ static attr_bitset get_attr(astree* root) {
 
 
 void enter_block () {
+	if (!infunc) {
+		blocknr += 1;
+	}
+	infunc = false;
+	next_block += 1;
+	block_count->push_back(blocknr);
+	(*stack).push_back(new symbol_table());
+}
+
+
+void enter_func () {
 	//printf("\nPushing symbol table %d\n", next_block);
+	infunc = true;
 	next_block += 1;
 	blocknr += 1;
 	block_count->push_back(blocknr);
 	(*stack).push_back(new symbol_table());
 }
-
 
 void enter_struct () {
 	(*stack).push_back(new symbol_table());
@@ -256,14 +268,12 @@ void block (astree* root) {
 }
 
 
-
-
-
 void call_op(astree* root) {
 	if (root == NULL) return;
 	symbol* func = lookup_func(root->children[0]->lexinfo); 
-	if (!func) {  // or not ATTR_funt this says prototypes can be called
-		errprintf ("%:%s: %d: error: calling undefinied function '%s'\n",
+	if (!func) {  
+		errprintf ("%:%s: %d: error: calling "
+			"undefinied function '%s'\n",
             included_filenames.back().c_str(),
             root->linenr, root->children[0]->lexinfo->c_str());
 		    exit(1);
@@ -277,7 +287,6 @@ void call_op(astree* root) {
 	cout << "made it here" << endl;
 	for (size_t i = 0; i< root->children.size()-1; ++i) {
 		astree* param = root->children[i+1];
-		
 		if (param->attr[ATTR_index]) {
 			cout << "ATTR INDEX !!!!!!" <<endl;
 			param = param->children[0];
@@ -288,8 +297,8 @@ void call_op(astree* root) {
 			if (sym) {
 				symbol* type = lookup_struct(sym->lexinfo);
 				if (!type | !(type->fields)) {
-					errprintf ("%:%s: %d: error: in function call '%s'"
-					": incomplete type definition for parameter '%s'\n",
+					errprintf ("%:%s: %d: error: function call '%s': "
+					"incomplete type definition for parameter '%s'\n",
             		included_filenames.back().c_str(),
            			param->linenr, 
            			root->children[0]->lexinfo->c_str(),
@@ -303,10 +312,6 @@ void call_op(astree* root) {
 		else{
 			comp_attr = param->attr;
 		}
-		cout << "made it here1" << endl;
-		cout << "made it here2" << endl;
-		// COMPAT DOES NOT WORK!!!!!!!!!!!!!!!!!
-		//if (idtype(sym->attr) != idtype(func->parameters->at(i)->attr)) {
 		cout << strattr(param) << endl;
 		cout << idtype(func->parameters->at(i)->attr) << endl;
 		if (!compat(comp_attr, func->parameters->at(i)->attr)) {
@@ -394,6 +399,8 @@ void proto_op (astree* root) {
 					param = paramlist->children[i]->children[1];
 			else param = paramlist->children[i]->children[0];
        	    symbol* sym = lookup(param->lexinfo);
+       	    sym->attr.set(ATTR_variable, true);
+       	    param->attr.set(ATTR_variable, true);
             func->parameters->push_back(sym);
     }
     // pop function symbol table off of variable stack
@@ -417,6 +424,43 @@ void proto_op (astree* root) {
 
 
 }
+
+
+
+
+void check_return (astree* root, int return_type, 
+	                    const string* tn, bool isarray) {
+	if (root == NULL) return;
+    for (size_t child = 0; child < root->children.size();
+        ++child) {
+        check_return (root->children[child], return_type, tn, isarray);
+    }
+    if (root->symbol == TOK_RETURN && ((!root->attr[return_type]) |
+       (root->attr[ATTR_array] != isarray))) {
+        errprintf ("%:%s: %d: error: incompatible return type1\n",
+            	included_filenames.back().c_str(),
+            	root->linenr);
+		    	exit(1);
+    }if (root->symbol == TOK_RETURNVOID 
+   	            && return_type != ATTR_void) {
+   		errprintf ("%:%s: %d: error: incompatible return type2\n",
+            	included_filenames.back().c_str(),
+            	root->linenr);
+		    	exit(1);
+    }if(root->symbol == TOK_RETURN) {
+        if (return_type == ATTR_struct && tn != NULL) {
+        	if (*root->typenm != *tn) {
+        		errprintf ("%:%s: %d: error: incompatible "
+        			"return type3\n",
+            	included_filenames.back().c_str(),
+            	root->linenr);
+		    	exit(1);
+        	}
+        }
+    }
+
+}
+
 
 
 void func_op (astree* root) {
@@ -475,6 +519,10 @@ void func_op (astree* root) {
 		    			exit(1);
 		    		}
 				}
+				int return_type = idtype(grandchild->attr);
+                check_return(root->children.back(), return_type, 
+            	    grandchild->typenm, grandchild->attr[ATTR_array]);
+
 			}if((params->children.size() != func->parameters->size()) |
 				(!root->children[0]->attr[ftype])) {
 				errprintf ("%:%s: %d: error: function does not "
@@ -501,6 +549,9 @@ void func_op (astree* root) {
 		    		exit(1);
         		}
     		}
+            int return_type = idtype(grandchild->attr);
+            check_return(root->children.back(), return_type, NULL,
+                                grandchild->attr[ATTR_array]);
     		cout << "NOT YET1" << endl;
     		func->attr.set(ATTR_prototype, false);
     		func->attr.set(ATTR_function, true);
@@ -525,10 +576,14 @@ void func_op (astree* root) {
 				exit(1);
 			}
 			func->lexinfo = strct->lexinfo;
+			int return_type = idtype(grandchild->attr);
+            check_return(root->children.back(), return_type, 
+            	strct->lexinfo, grandchild->attr[ATTR_array]);
 		}
 		func->parameters = new vector<symbol*>;
 		grandchild->attr |= root->children[0]->attr;
 		grandchild->attr.set(ATTR_function, true);
+		grandchild->attr.set(ATTR_lval, false);
 
 		func->attr |= grandchild->attr;
 		astree* paramlist = root->children.at(1);
@@ -538,8 +593,13 @@ void func_op (astree* root) {
 					param = paramlist->children[i]->children[1];
 			else param = paramlist->children[i]->children[0];
        	    symbol* sym = lookup(param->lexinfo);
+       	    sym->attr.set(ATTR_variable, true);
+       	    param->attr.set(ATTR_variable, true);
             func->parameters->push_back(sym);
         }
+        int return_type = idtype(grandchild->attr);
+        check_return(root->children.back(), return_type, NULL,
+                                grandchild->attr[ATTR_array]);
         symbol_table* table = stack->back();
     	gc->push_back(table);
     	stack->pop_back();
@@ -558,6 +618,7 @@ void func_op (astree* root) {
 	}
 
 }
+
 
 // add type checking
 void paramlist (astree* root) {
@@ -680,6 +741,12 @@ void newarray_op (astree* root) {
 	if  (root == NULL) return;
 	if (!root->children[1]->attr[ATTR_int]) {
 		errprintf ("%:%s: %d: error: required int got '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, strattr(root->children[0]).c_str());
+		    exit(1);
+	}else if (root->children[0]->attr[ATTR_array]) {
+		errprintf ("%:%s: %d: error: array of arrays not "
+			"permitted\n",
             included_filenames.back().c_str(),
             root->linenr, strattr(root->children[0]).c_str());
 		    exit(1);
@@ -866,7 +933,7 @@ void vardecl (astree* root) {
     								->children.back();
     else grandchild = root->children.front()
     								->children.front();
-    cout << "here" << endl;
+    grandchild->attr.set(ATTR_variable, true);
     if  (root->children[0]->attr[ATTR_array] != 
     	 root->children[1]->attr[ATTR_array]) {
     	errprintf ("%:%s: %d: error: array only assignable"
@@ -897,7 +964,7 @@ void vardecl (astree* root) {
             	type2->lexinfo->c_str());
 		    	exit(1);
     		}
-    		cout << "type1 =" << type1->lexinfo->c_str() << "type2 =" << type2->lexinfo->c_str() << endl;
+    		
 
     	}else {
     		int type = idtype(root->children.back()->attr);
@@ -1112,6 +1179,19 @@ void sign_op (astree* root) {
               root->linenr,
               root->children[0]->lexinfo->c_str());
 		exit(1);
+	}
+}
+
+
+void return_op (astree* root) {
+	if  (root == NULL) return;
+	if  ((root->children.size())) {
+		root->attr |= root->children[0]->attr;
+		if (root->children[0]->attr[ATTR_struct]) {
+			root->typenm = root->children[0]->typenm;
+		}
+    }else{
+		root->attr.set(ATTR_void);
 	}
 }
 
@@ -1431,6 +1511,12 @@ func getfunc (int TOK_TYPE) {
 			break;
 		case (TOK_POS):
 			foo = sign_op;
+			break;
+		case (TOK_RETURN):
+			foo = return_op;
+			break;
+		case (TOK_RETURNVOID):
+			foo = return_op;
 			break;
 		case ('.'):
 			foo = dot_op;

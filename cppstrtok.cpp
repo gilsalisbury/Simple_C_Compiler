@@ -29,6 +29,7 @@ const size_t LINESIZE = 1024;
 extern int yy_flex_debug;
 extern FILE* tokenout;
 FILE* astout;
+FILE* symout;
 
 // Chomp the last character from a buffer if it is delim.
 void chomp (char* string, char delim) {
@@ -40,7 +41,7 @@ void chomp (char* string, char delim) {
 
 int main (int argc, char** argv) {
    int c;
-   string name, ext, strfn, tokfn, astfn;
+   string name, ext, strfn, tokfn, astfn, symfn;
 
    // check if name is long enough to contain .oc
    name = string(argv[argc-1]);
@@ -63,6 +64,7 @@ int main (int argc, char** argv) {
    strfn = strfn.substr(0, strfn.length()-3);
    tokfn = strfn + ".tok";
    astfn = strfn + ".ast";
+   symfn = strfn + ".sym";
    strfn += ".str";
    DEBUGF('d', name.c_str());
    yy_flex_debug = 0;
@@ -110,6 +112,7 @@ int main (int argc, char** argv) {
          int parsecode;
          tokenout = fopen(tokfn.c_str(), "w");
          astout = fopen(astfn.c_str(), "w");
+         symout = fopen(symfn.c_str(), "w");
          parsecode = yyparse();
          if (parsecode == YYEOF) {/*do nothing*/}
          int pclose_rc = pclose (yyin) >> 8;
@@ -121,8 +124,9 @@ int main (int argc, char** argv) {
             stringout.open(strfn, ostream::out);
             dump_stringset(stringout);
             dump_astree(astout, yyparse_astree);
-            type_ast(stdout, yyparse_astree);
+            type_ast(symout, yyparse_astree);
             fclose(astout);
+            fclose(symout);
             stringout.close();
             fclose(tokenout);
             free_ast(yyparse_astree);
