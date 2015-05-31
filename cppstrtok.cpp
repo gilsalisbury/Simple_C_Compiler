@@ -46,13 +46,13 @@ int main (int argc, char** argv) {
    // check if name is long enough to contain .oc
    name = string(argv[argc-1]);
    if(name.length() <3) {
-      fprintf(stderr, "error: invalid filename\n");
+      fprintf(stderr, "oc: error: invalid filename\n");
       exit(1);
    }
    //  if name is long enough check extension == .oc
    ext = name.substr(name.length()-3);
    if (ext != ".oc") {
-      fprintf(stderr, "invalid file type\n");
+      fprintf(stderr, "oc: invalid file type\n");
       exit(1);
    }
 
@@ -76,7 +76,7 @@ int main (int argc, char** argv) {
             case '@': 
                if ((string(optarg) != "d") && (string(optarg) != "f") 
                                           && (string(optarg) != "a")) {
-                  syserrprintf ("usage: oc [-ly] [-@ flag...] "
+                  syserrprintf ("oc: usage: oc [-ly] [-@ flag...] "
                      "[-D string] program.oc\n");
                   syserrprintf ("[-@ flag...] valid options "
                      "are:\n\t-@d ~ enable debug printing\n" );
@@ -117,14 +117,14 @@ int main (int argc, char** argv) {
          if (parsecode == YYEOF) {/*do nothing*/}
          int pclose_rc = pclose (yyin) >> 8;
          if (pclose_rc != 0){
-            fprintf(stderr, "invalid file name\n");
+            fprintf(stderr, "oc: invalid file name\n");
             exit(1);
          }else{
             // open outfile &ostream
             stringout.open(strfn, ostream::out);
             dump_stringset(stringout);
-            dump_astree(astout, yyparse_astree);
             type_ast(symout, yyparse_astree);
+            dump_astree(astout, yyparse_astree);
             fclose(astout);
             fclose(symout);
             stringout.close();

@@ -1,19 +1,54 @@
-struct node { int foo; node link; }   
 
-node func (node head, int length) { 
+#include "oclib.oh"
 
-   int a = 0; string b = ""; node c = new node(); 
-
-   if (a < 3) { int d = 8; a = length; c = c.link; } 
-
-         else { string e = "";    
-
-                if (0 == 0) { int f = 8; } 
-
-                       else { int g = 9; } 
-
-              } 
-
+struct node {
+   string data;
+   node link;
 }
 
-node h = func (null, 10);
+struct stack {
+   node top;
+}
+
+bool empty (stack stack) {
+   assert (stack != null);
+   return stack.top == null;
+}
+
+stack new_stack () {
+   stack stack = new stack ();
+   stack.top = null;
+   return stack;
+}
+
+void push (stack stack, string str) {
+   assert (stack != null);
+   node tmp = new node ();
+   tmp.data = str;
+   tmp.link = stack.top;
+   stack.top = tmp;
+}
+
+string pop (stack stack) {
+   assert (stack != null);
+   assert (! empty (stack));
+   string tmp = stack.top.data;
+   stack.top = stack.top.link;
+   return tmp;
+}
+
+// Main program.
+
+string[] argv = getargv ();
+stack stack = new_stack ();
+int argi = 0;
+
+while (argv[argi] != null) {
+   push (stack, argv[argi]);
+   argi = argi + 1;
+}
+
+while (! empty (stack)) {
+   puts (pop (stack));
+   endl ();
+}

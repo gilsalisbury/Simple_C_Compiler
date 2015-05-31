@@ -14,6 +14,7 @@
 #include "stringset.h"
 #include "lyutils.h"
 
+#define X 0
 
 
 astree::astree (int symbol, int filenr, int linenr,
@@ -142,26 +143,30 @@ static void dump_astree_rec (FILE* outfile, astree* root,
 }
 
 
-static void postorder (FILE* outfile, astree* root,
+static void postorder ( astree* root,
                              int depth) {
    if (root == NULL) return;
    if (root->symbol == TOK_BLOCK) enter_block();
    if (root->symbol == TOK_STRUCT) enter_struct();
-   if (root->symbol == TOK_FUNCTION) enter_func();
+   if (root->symbol == TOK_FUNCTION) enter_func(root);
    if (root->symbol == TOK_PROTOTYPE) enter_block();
    
    for (size_t child = 0; child < root->children.size();
         ++child) {
-      postorder (outfile, root->children[child],
+      postorder (root->children[child],
                        depth + 1);
    }
-   for(int i=0; i<depth; i++) {
-      fprintf(outfile, "|  ");
-   }
+
    func foo = getfunc(root->symbol);
    foo(root);
-   dump_node (stdout, root);
-   fprintf (outfile, "\n");
+   if (X) {
+      for(int i=0; i<depth; i++) {
+         fprintf(stdout, "|  ");
+      }
+      dump_node (stdout, root);
+      cout << endl;
+   }
+   
 }
 
 
@@ -173,7 +178,7 @@ static void preorder (FILE* outfile, astree* root,
       fprintf(outfile, "|  ");
    }
 
-   dump_node (stdout, root);
+   dump_node (outfile, root);
    fprintf (outfile, "\n");
    for (size_t child = 0; child < root->children.size();
         ++child) {
@@ -222,7 +227,8 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
           for (size_t child = 1; child < node->children.size();
               ++child) {
               fprintf(outfile, "  ");
-              sym_dump_node (outfile, node->children[child]->children[0]);
+              sym_dump_node (outfile, 
+                node->children[child]->children[0]);
           }
           if (depth == 0)  fprintf(outfile, "\n");
       }else if ((node->symbol == TOK_FUNCTION) | 
@@ -233,8 +239,8 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
           if (node->children[0]->symbol == TOK_ARRAY) 
               sym_dump_node(outfile, node->children[0]->children[1]);
           else sym_dump_node(outfile, node->children[0]->children[0]);
-          for (size_t child = 0; child < node->children[1]->children.size();
-              ++child) {
+          for (size_t child = 0; child < 
+                         node->children[1]->children.size(); ++child) {
               astree* param = node->children[1]->children[child];
               if (param->attr[ATTR_array]) param = param->children[1];
               else param = param->children[0];
@@ -247,13 +253,12 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
           for(int i=0; i<depth; i++) {
               fprintf(outfile, "  ");
           }
-          //if (depth == 0)  fprintf(outfile, "\n");
+          if (depth == 0)  fprintf(outfile, "\n");
           if (node->children[0]->symbol == TOK_ARRAY) 
               sym_dump_node(outfile, node->children[0]->children[1]);
           else sym_dump_node(outfile, node->children[0]->children[0]);
-
-
       }
+
   }
    for (size_t child = 0; child < node->children.size();
         ++child) {
@@ -275,23 +280,28 @@ void dump_error (FILE* outfile, astree* root,
 }
 
 
-void type_ast (FILE* outfile, astree* root) {
-   init_symbol_table();
-   preorder (outfile, root, 0);
-   printf("\n\n\n");
-   postorder (outfile, root, 0);
-   printf("\n\n\n");
-   preorder (stdout, root, -1);
-   printf("\n\n\n");
-   sym_preorder (stdout, root, -1);
-   fflush (NULL);
-}
-
-
 void dump_astree (FILE* outfile, astree* root) {
    dump_astree_rec (outfile, root, 0);
    fflush (NULL);
 }
+
+
+void type_ast (FILE* outfile, astree* root) {
+   init_symbol_table();
+   if (X) {
+      cout << "\n\n\n\n";
+      preorder(outfile, root, 0);
+      cout << "\n\n\n\n";
+   }
+   postorder (root, 0);
+   if (X) {
+      cout << "\n\n\n\n";
+      preorder(outfile, root, 0);
+   }
+   sym_preorder (outfile, root, -1);
+   fflush (NULL);
+}
+
 
 
 void yyprint (FILE* outfile, unsigned short toknum,

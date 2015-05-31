@@ -5,10 +5,9 @@ partner: none
 
 CMPS104a Spring 2015
 
-Assignmnet 3:
+Assignmnet 4:
 
-This assignment added a parser to our compiler in progress.
-The majority of the work was done in parser.y.
+This assignment type checked our ast.
 
 This program should take any .oc file as input and output 
 three files:
@@ -16,3 +15,4 @@ three files:
 program.str
 program.tok
 program.ast
+program.sym
