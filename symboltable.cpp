@@ -261,6 +261,7 @@ void enter_func (astree* root) {
     }
     if(insert(grandchild->lexinfo, func)) {
         grandchild->blocknr = block_count->back();
+        func->blocknr = block_count->back();
     }else{
         errprintf ("%:%s: %d: error: programmer error "
             "existing function '%s'\n",
@@ -443,6 +444,7 @@ void proto_op (astree* root) {
     // insert the function symbol into stack error if already there.
     if(insert(grandchild->lexinfo, func)) {
         grandchild->blocknr = block_count->back();
+        func->blocknr = block_count->back();
         return;
     }else{
         errprintf ("%:%s: %d: error: prototype redefines "
@@ -588,6 +590,8 @@ void func_op (astree* root) {
             stack->pop_back();
             block_count->pop_back();
             --next_block;
+            //func->blocknr = block_count->back();
+            grandchild->blocknr = block_count->back();
         }
     }else if (func && !func->parameters) {
         //else func = new symbol (root->filenr, 
@@ -634,6 +638,7 @@ void func_op (astree* root) {
         --next_block;
         root->attr.set(ATTR_lval, false);
         root->attr.set(ATTR_variable, false);
+        grandchild->blocknr = block_count->back();
     }
     funcbody = false;
 
@@ -1075,6 +1080,7 @@ void dot_op (astree* root) {
         exit(1);
     }
     root->attr |= fieldsym->attr;
+    field->oftype = obj->typenm;
     if (fieldsym->attr[ATTR_struct]) {
         root->typenm = fieldsym->lexinfo;
     }

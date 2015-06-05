@@ -13,6 +13,7 @@
 #include "astree.h"
 #include "stringset.h"
 #include "lyutils.h"
+#include "emit.h"
 
 #define X 0
 
@@ -190,21 +191,27 @@ static void preorder (FILE* outfile, astree* root,
 
 
 static bool sym_dump_node (FILE* outfile, astree* node) {
-   const char *tname = get_yytname (node->symbol);
-   if (strstr (tname, "TOK_") == tname) tname += 4;
-   
-   fprintf (outfile, "%s (%ld:%ld.%0ld) {%d} %s",
+    const char *tname = get_yytname (node->symbol);
+    if (strstr (tname, "TOK_") == tname) tname += 4;
+    if (!node->attr[ATTR_field]) {
+      fprintf (outfile, "%s (%ld:%ld.%0ld) {%d} %s",
             node->lexinfo->c_str(),
             node->filenr, node->linenr, node->offset,
             node->blocknr, strattr(node).c_str());
-   bool need_space = false;
-   for (size_t child = 0; child < node->children.size();
+    }else 
+      fprintf (outfile, "%s (%ld:%ld.%0ld)  %s",
+            node->lexinfo->c_str(),
+            node->filenr, node->linenr, node->offset,
+            strattr(node).c_str());
+
+    bool need_space = false;
+    for (size_t child = 0; child < node->children.size();
         ++child) {
       if (need_space) fprintf (outfile, " ");
       need_space = true;
-   }
-   fprintf (outfile, "\n");
-   return true;
+    }
+    fprintf (outfile, "\n");
+    return true;
 }
 
 
@@ -212,13 +219,11 @@ static bool sym_dump_node (FILE* outfile, astree* node) {
 
 static void sym_preorder (FILE* outfile, astree* node, int depth) {
   if (node == NULL) return;
-    
+  if (node->symbol == TOK_STRINGCON) prefix_strcon (node);
   if ((node->symbol == TOK_STRUCT) | (node->symbol == TOK_VARDECL) |
       (node->symbol == TOK_PROTOTYPE)|(node->symbol == TOK_FUNCTION)) {
 
 
-
-      //cout << endl;
       if (node->symbol == TOK_STRUCT) {
           for(int i=0; i<depth; i++) {
               fprintf(outfile, "  ");
@@ -230,16 +235,22 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
               sym_dump_node (outfile, 
                 node->children[child]->children[0]);
           }
+          prefix_struct(node);
           if (depth == 0)  fprintf(outfile, "\n");
       }else if ((node->symbol == TOK_FUNCTION) | 
                 (node->symbol == TOK_PROTOTYPE)) {
           for(int i=0; i<depth; i++) {
               fprintf(outfile, "  ");
           }
-          if (node->children[0]->symbol == TOK_ARRAY) 
+          if (node->children[0]->symbol == TOK_ARRAY) { 
               sym_dump_node(outfile, node->children[0]->children[1]);
-          else sym_dump_node(outfile, node->children[0]->children[0]);
-          for (size_t child = 0; child < 
+              if (node->symbol == TOK_FUNCTION)
+                prefix_func (node, node->children[0]->children[1]);
+          }else {
+            sym_dump_node(outfile, node->children[0]->children[0]);
+            if (node->symbol == TOK_FUNCTION)
+              prefix_func (node, node->children[0]->children[0]);
+          }for (size_t child = 0; child < 
                          node->children[1]->children.size(); ++child) {
               astree* param = node->children[1]->children[child];
               if (param->attr[ATTR_array]) param = param->children[1];
@@ -253,10 +264,19 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
           for(int i=0; i<depth; i++) {
               fprintf(outfile, "  ");
           }
-          if (depth == 0)  fprintf(outfile, "\n");
-          if (node->children[0]->symbol == TOK_ARRAY) 
+          bool vglobal = 0;
+          if (depth == 0)  {
+              fprintf(outfile, "\n");
+              vglobal = true;
+          }if (node->children[0]->symbol == TOK_ARRAY) {
               sym_dump_node(outfile, node->children[0]->children[1]);
-          else sym_dump_node(outfile, node->children[0]->children[0]);
+              if (vglobal)
+                  prefix_vars (node->children[0]->children[1]);
+          }else{
+              sym_dump_node(outfile, node->children[0]->children[0]);
+              if (vglobal)
+                  prefix_vars (node->children[0]->children[0]);
+          } 
       }
 
   }

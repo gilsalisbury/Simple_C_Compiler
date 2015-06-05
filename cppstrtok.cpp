@@ -23,6 +23,7 @@ using namespace std;
 #include "auxlib.h"
 #include "stringset.h"
 #include "lyutils.h"
+#include "emit.h"
 
 const string CPP = "/usr/bin/cpp";
 const size_t LINESIZE = 1024;
@@ -124,7 +125,8 @@ int main (int argc, char** argv) {
             stringout.open(strfn, ostream::out);
             dump_stringset(stringout);
             type_ast(symout, yyparse_astree);
-            dump_astree(astout, yyparse_astree);
+            dump_astree(stdout, yyparse_astree);
+            //emit_sm_code(yyparse_astree);
             fclose(astout);
             fclose(symout);
             stringout.close();

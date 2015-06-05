@@ -17,7 +17,6 @@ using symbol_entry = symbol_table::value_type;
 using symbol_stack = vector<symbol_table*>;
 
 
-
 struct symbol {
     const string* lexinfo = NULL;
     attr_bitset attr;
@@ -35,7 +34,7 @@ bool attr_and(attr_bitset, ... );
 bool attr_or(attr_bitset, ... );
 bool insert (const string* str, symbol* sym);
 string strattr (astree* root);
-
+int idtype (attr_bitset bits);
 
 typedef void (*func) (astree* root);
 void vardecl_type(astree* root);

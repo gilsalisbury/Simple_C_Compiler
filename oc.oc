@@ -1,54 +1,16 @@
 
-#include "oclib.oh"
 
-struct node {
-   string data;
-   node link;
+struct foo {
+    bar b;
+    int i;
 }
 
-struct stack {
-   node top;
-}
+foo[] f = new foo[32];
+int a (int b, int c, int d) {
+    int a = f[3].i;
+    while (a > 0) {
+        a(1, 2, 3);
+        a = a-1;
+    }
 
-bool empty (stack stack) {
-   assert (stack != null);
-   return stack.top == null;
-}
-
-stack new_stack () {
-   stack stack = new stack ();
-   stack.top = null;
-   return stack;
-}
-
-void push (stack stack, string str) {
-   assert (stack != null);
-   node tmp = new node ();
-   tmp.data = str;
-   tmp.link = stack.top;
-   stack.top = tmp;
-}
-
-string pop (stack stack) {
-   assert (stack != null);
-   assert (! empty (stack));
-   string tmp = stack.top.data;
-   stack.top = stack.top.link;
-   return tmp;
-}
-
-// Main program.
-
-string[] argv = getargv ();
-stack stack = new_stack ();
-int argi = 0;
-
-while (argv[argi] != null) {
-   push (stack, argv[argi]);
-   argi = argi + 1;
-}
-
-while (! empty (stack)) {
-   puts (pop (stack));
-   endl ();
 }

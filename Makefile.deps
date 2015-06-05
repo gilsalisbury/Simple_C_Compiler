@@ -1,4 +1,4 @@
-# Makefile.deps created Sat May 30 10:50:12 PDT 2015 by make
+# Makefile.deps created Mon Jun  1 22:28:22 PDT 2015 by make
 astree.o: astree.cpp symboltable.h astree.h auxlib.h stringset.h \
  lyutils.h yyparse.h
 lyutils.o: lyutils.cpp lyutils.h astree.h auxlib.h yyparse.h
@@ -7,6 +7,8 @@ symboltable.o: symboltable.cpp symboltable.h astree.h auxlib.h lyutils.h \
  yyparse.h
 stringset.o: stringset.cpp stringset.h
 cppstrtok.o: cppstrtok.cpp auxlib.h stringset.h lyutils.h astree.h \
- yyparse.h
+ yyparse.h emit.h
+emit.o: emit.cpp astree.h auxlib.h emit.h lyutils.h yyparse.h
+mangle.o: mangle.cpp mangle.h symboltable.h astree.h auxlib.h
 yylex.o: yylex.cpp auxlib.h lyutils.h astree.h yyparse.h
 yyparse.o: yyparse.cpp lyutils.h astree.h auxlib.h yyparse.h
