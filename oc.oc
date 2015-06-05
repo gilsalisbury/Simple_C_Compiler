@@ -1,16 +1,10 @@
 
 
-struct foo {
-    bar b;
-    int i;
-}
+int func (int b, int c) {
 
-foo[] f = new foo[32];
-int a (int b, int c, int d) {
-    int a = f[3].i;
-    while (a > 0) {
-        a(1, 2, 3);
-        a = a-1;
+    while (b<c) {
+        int i = 3 + 4;
     }
+
 
 }
