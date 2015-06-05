@@ -126,7 +126,7 @@ int main (int argc, char** argv) {
             dump_stringset(stringout);
             type_ast(symout, yyparse_astree);
             dump_astree(stdout, yyparse_astree);
-            //emit_sm_code(yyparse_astree);
+            emit_ta_code(yyparse_astree);
             fclose(astout);
             fclose(symout);
             stringout.close();

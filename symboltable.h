@@ -22,7 +22,7 @@ struct symbol {
     attr_bitset attr;
     symbol_table* fields = NULL;
     size_t filenr, linenr, offset;
-    size_t blocknr;
+    int blocknr;
     vector<symbol*>* parameters = NULL;
     symbol( size_t filenr, size_t linenr, size_t offset,
         size_t blocknr );

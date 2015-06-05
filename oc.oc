@@ -1,10 +1,11 @@
 
 
-int func (int b, int c) {
 
-    while (b<c) {
-        int i = 3 + 4;
-    }
+struct foo {
+    int a;
+}
 
+int func ( int b ) {
+    string s = new string(b+4);
 
 }

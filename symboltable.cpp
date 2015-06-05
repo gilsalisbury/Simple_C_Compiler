@@ -937,6 +937,19 @@ void declid (astree* root) {
         symbol *sym = new symbol(root->filenr, 
             root->linenr, root->offset, block_count->back());
         sym->attr.set(ATTR_lval, true);
+        // added this condition very percarious
+        if (lookup (root->lexinfo)){
+            symbol* sym = lookup (root->lexinfo);
+            if ( !(lookup_func (root->lexinfo)) &&
+                sym->blocknr == block_count->back()) {
+                errprintf ("%:%s: %d: error: redeclaration"
+                ": '%s'\n",
+                included_filenames.back().c_str(),
+                root->linenr, root->lexinfo->c_str());
+                exit(1);
+            }
+        }
+        // added this condtion
         if(insert(root->lexinfo, sym)) {
            root->attr.set(ATTR_lval, true);
            root->blocknr = block_count->back();
@@ -962,6 +975,13 @@ void vardecl (astree* root) {
     else grandchild = root->children.front()
                             ->children.front();
     grandchild->attr.set(ATTR_variable, true);
+    /*if (lookup (grandchild->lexinfo)) {
+        errprintf ("%:%s: %d: error:"
+            " redeclaration of %s: '%s'\n",
+            included_filenames.back().c_str(),
+            root->linenr, grandchild->lexinfo->c_str());
+            exit(1);
+    }*/
     if  (root->children[0]->attr[ATTR_array] != 
         root->children[1]->attr[ATTR_array]) {
         errprintf ("%:%s: %d: error: array only assignable"
@@ -1389,10 +1409,12 @@ void ident (astree* root) {
         root->typenm = sym->lexinfo;
         sym->attr.set(ATTR_variable);
         root->attr |= sym->attr;
+        root->blocknr = sym->blocknr;
 
     }else{
         sym->attr.set(ATTR_variable);
         root->attr |= sym->attr;
+        root->blocknr = sym->blocknr;
     }
 }
 
