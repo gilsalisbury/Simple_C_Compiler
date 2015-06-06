@@ -235,7 +235,7 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
               sym_dump_node (outfile, 
                 node->children[child]->children[0]);
           }
-          prefix_struct(node);
+          //prefix_struct(node);
           if (depth == 0)  fprintf(outfile, "\n");
       }else if ((node->symbol == TOK_FUNCTION) | 
                 (node->symbol == TOK_PROTOTYPE)) {
@@ -244,12 +244,14 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
           }
           if (node->children[0]->symbol == TOK_ARRAY) { 
               sym_dump_node(outfile, node->children[0]->children[1]);
-              if (node->symbol == TOK_FUNCTION)
-                prefix_func (node, node->children[0]->children[1]);
+              if (node->symbol == TOK_FUNCTION) {
+                //prefix_func (node, node->children[0]->children[1]);
+              }
           }else {
             sym_dump_node(outfile, node->children[0]->children[0]);
-            if (node->symbol == TOK_FUNCTION)
-              prefix_func (node, node->children[0]->children[0]);
+            if (node->symbol == TOK_FUNCTION){
+              //prefix_func (node, node->children[0]->children[0]);
+            }
           }for (size_t child = 0; child < 
                          node->children[1]->children.size(); ++child) {
               astree* param = node->children[1]->children[child];
@@ -270,12 +272,14 @@ static void sym_preorder (FILE* outfile, astree* node, int depth) {
               vglobal = true;
           }if (node->children[0]->symbol == TOK_ARRAY) {
               sym_dump_node(outfile, node->children[0]->children[1]);
-              if (vglobal)
+              if (vglobal){
                   prefix_vars (node->children[0]->children[1]);
+              }
           }else{
               sym_dump_node(outfile, node->children[0]->children[0]);
-              if (vglobal)
+              if (vglobal) {
                   prefix_vars (node->children[0]->children[0]);
+              }
           } 
       }
 

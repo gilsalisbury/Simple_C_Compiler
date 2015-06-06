@@ -31,6 +31,7 @@ extern int yy_flex_debug;
 extern FILE* tokenout;
 FILE* astout;
 FILE* symout;
+FILE* oilout;
 
 // Chomp the last character from a buffer if it is delim.
 void chomp (char* string, char delim) {
@@ -42,7 +43,7 @@ void chomp (char* string, char delim) {
 
 int main (int argc, char** argv) {
    int c;
-   string name, ext, strfn, tokfn, astfn, symfn;
+   string name, ext, strfn, tokfn, astfn, symfn, oilfn, cmpl;
 
    // check if name is long enough to contain .oc
    name = string(argv[argc-1]);
@@ -66,6 +67,14 @@ int main (int argc, char** argv) {
    tokfn = strfn + ".tok";
    astfn = strfn + ".ast";
    symfn = strfn + ".sym";
+   oilfn = strfn + ".oil";
+   cmpl  = "gcc -g -o " + strfn + " -x c " + 
+                  oilfn.c_str() + " oclib.c";
+   if (strfn == "oc") {
+      errprintf ("error: programmer error execname cannot"
+            "be oc");
+            exit(1);
+   }
    strfn += ".str";
    DEBUGF('d', name.c_str());
    yy_flex_debug = 0;
@@ -114,6 +123,7 @@ int main (int argc, char** argv) {
          tokenout = fopen(tokfn.c_str(), "w");
          astout = fopen(astfn.c_str(), "w");
          symout = fopen(symfn.c_str(), "w");
+         oilout = fopen(oilfn.c_str(), "w");
          parsecode = yyparse();
          if (parsecode == YYEOF) {/*do nothing*/}
          int pclose_rc = pclose (yyin) >> 8;
@@ -126,7 +136,9 @@ int main (int argc, char** argv) {
             dump_stringset(stringout);
             type_ast(symout, yyparse_astree);
             dump_astree(stdout, yyparse_astree);
-            emit_ta_code(yyparse_astree);
+            emit_ta_code(oilout, yyparse_astree);
+            fflush(NULL);
+            //system (cmpl.c_str());
             fclose(astout);
             fclose(symout);
             stringout.close();

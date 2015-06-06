@@ -255,6 +255,7 @@ void enter_func (astree* root) {
             root->linenr, root->offset, block_count->back()-1);
         grandchild->attr |= root->children[0]->attr;
         func->attr |= grandchild->attr;
+        //func->attr.set(ATTR_prototype, true);
         if (grandchild->attr[ATTR_struct]) {
             func->lexinfo = grandchild->typenm;
         }
@@ -418,6 +419,7 @@ void proto_op (astree* root) {
     func->attr.set(ATTR_prototype, true);
     func->lexinfo = typenm;
     grandchild->attr |= func->attr;
+    grandchild->attr |= root->children[0]->attr;
     func->attr |= grandchild->attr;
     astree* paramlist = root->children[1];
     grandchild->attr.set(ATTR_lval, false);
