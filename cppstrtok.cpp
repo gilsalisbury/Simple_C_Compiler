@@ -68,7 +68,7 @@ int main (int argc, char** argv) {
    astfn = strfn + ".ast";
    symfn = strfn + ".sym";
    oilfn = strfn + ".oil";
-   cmpl  = "gcc -g -o " + strfn + " -x c " + 
+   cmpl  = "gcc -g -o " + strfn + " -w -x c " + 
                   oilfn.c_str() + " oclib.c";
    if (strfn == "oc") {
       errprintf ("error: programmer error execname cannot"
@@ -138,7 +138,7 @@ int main (int argc, char** argv) {
             dump_astree(stdout, yyparse_astree);
             emit_ta_code(oilout, yyparse_astree);
             fflush(NULL);
-            //system (cmpl.c_str());
+            system (cmpl.c_str());
             fclose(astout);
             fclose(symout);
             stringout.close();
