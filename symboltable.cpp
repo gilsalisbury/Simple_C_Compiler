@@ -555,7 +555,8 @@ void func_op (astree* root) {
                 check_return(root->children.back(), return_type, 
                     grandchild->typenm, grandchild->attr[ATTR_array]);
             }if((params->children.size() != func->parameters->size()) |
-                (ftype < ATTR_bitset_size && !root->children[0]->attr[ftype])) {
+                (ftype < ATTR_bitset_size && 
+                    !root->children[0]->attr[ftype])) {
                 errprintf ("%:%s: %d: error: function does not "
                     "match prototype definition '%s'\n",
                     included_filenames.back().c_str(),
