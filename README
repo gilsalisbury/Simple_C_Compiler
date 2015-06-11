@@ -5,14 +5,19 @@ partner: none
 
 CMPS104a Spring 2015
 
-Assignmnet 4:
+Assignmnet 5:
 
-This assignment type checked our ast.
+This assignment generates oil code.
+
+Oil code compiles and runs for some programs, but fails due
+to some pointer assignments and some cases of nested if elses
+among others...
 
 This program should take any .oc file as input and output 
-three files:
+five files:
 
 program.str
 program.tok
 program.ast
 program.sym
+program.oil
