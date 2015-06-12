@@ -766,6 +766,7 @@ void index_op (astree* root) {
         root->attr.set(ATTR_string, false);
         root->attr.set(ATTR_char, true);
     }
+    root->attr.set(ATTR_vaddr, true);
     root->attr.set(ATTR_lval, false);
     root->attr.set(ATTR_variable, false);
     root->attr.set(ATTR_array, false);
