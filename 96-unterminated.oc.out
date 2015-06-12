@@ -1,6 +1,0 @@
-ROOT "" 0:0.000       
-
-
-void __ocmain (void) {
-return;
-};

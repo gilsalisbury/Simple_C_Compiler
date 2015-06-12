@@ -1,6 +1,0 @@
-#include "oclib.oh"
-char* c1 = "Hello, world!\n";
-void __ocmain (void) {
-        __puts(c1);
-return;
-};

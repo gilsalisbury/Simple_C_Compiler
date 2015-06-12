@@ -1,5 +1,0 @@
-53-insertionsort.oil: In function ‘__insertion_sort’:
-53-insertionsort.oil:49:24: error: ‘sorted’ undeclared (first use in this function)
-         int _15_slot = sorted;
-                        ^
-53-insertionsort.oil:49:24: note: each undeclared identifier is reported only once for each function it appears in
