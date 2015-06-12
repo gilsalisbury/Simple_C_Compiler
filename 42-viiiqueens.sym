@@ -1,0 +1,30 @@
+__assert_fail (5:23.5) {0} void prototype 
+  expr (5:23.27) {1} string variable param lval 
+  file (5:23.40) {1} string variable param lval 
+  line (5:23.50) {1} int variable param lval 
+putb (5:24.5) {0} void prototype 
+  b (5:24.16) {2} bool variable param lval 
+putc (5:25.5) {0} void prototype 
+  c (5:25.16) {3} char variable param lval 
+puti (5:26.5) {0} void prototype 
+  i (5:26.15) {4} int variable param lval 
+puts (5:27.5) {0} void prototype 
+  s (5:27.18) {5} string variable param lval 
+endl (5:28.5) {0} void prototype 
+getc (5:29.4) {0} int prototype 
+getw (5:30.7) {0} string prototype 
+getln (5:31.7) {0} string prototype 
+getargv (5:32.9) {0} string array vaddr prototype 
+exit (5:33.5) {0} void prototype 
+  status (5:33.15) {11} int variable param lval 
+
+board (6:6.6) {0} int array variable lval 
+is_safe (6:8.5) {0} bool function 
+  newcol (6:8.18) {12} int variable param lval 
+  col (6:9.7) {12} int variable lval 
+      diagonal (6:12.10) {13} int variable lval 
+printqueens (6:20.5) {0} void function 
+  col (6:21.7) {14} int variable lval 
+queens (6:29.5) {0} void function 
+  newcol (6:29.17) {16} int variable param lval 
+      row (6:32.10) {17} int variable lval 

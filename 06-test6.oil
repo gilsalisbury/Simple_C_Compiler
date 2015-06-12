@@ -1,0 +1,14 @@
+#include "oclib.oh"
+struct s_foo {
+};
+struct s_bar {
+};
+char* c1 = "a";
+char* __s;
+char** __sa;
+void __ocmain (void) {
+        char* __s = c1;
+        char**  c2 = xcalloc (10, sizeof(char*));
+        char** __sa = c2;
+return;
+};

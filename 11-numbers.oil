@@ -1,0 +1,17 @@
+#include "oclib.oh"
+int __number;
+void __ocmain (void) {
+        int __number = 1;
+while_6_6_0:;
+        char  c1 = __number > 0;
+        if(!c1) goto break_6_6_0;
+        __puti(__number);
+        __putc('\n');
+        int  i5 = __number + __number;
+         __number = i5;
+        goto while_6_6_0;
+break_6_6_0:;
+        __puti(__number);
+        __putc('\n');
+return;
+};

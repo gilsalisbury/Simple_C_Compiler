@@ -1,0 +1,12 @@
+41-linkedstack.oil: In function ‘__new_stack’:
+41-linkedstack.oil:38:16: error: ‘null’ undeclared (first use in this function)
+         *a22 = null;
+                ^
+41-linkedstack.oil:38:16: note: each undeclared identifier is reported only once for each function it appears in
+41-linkedstack.oil: In function ‘__pop’:
+41-linkedstack.oil:82:28: error: request for member ‘f_node_data’ in something not a structure or union
+         char*  *a65 = &*a63->f_node_data;
+                            ^
+41-linkedstack.oil:86:37: error: request for member ‘f_node_link’ in something not a structure or union
+         struct s_node*  *a71 = &*a69->f_node_link;
+                                     ^

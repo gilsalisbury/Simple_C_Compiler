@@ -1,0 +1,19 @@
+Makefile:136: Makefile.deps: No such file or directory
+gmake --no-print-directory deps
+flex --outfile=yylex.cpp scanner.l 2>yylex.output
+grep -v '^  ' yylex.output
+flex version 2.5.35 usage statistics:
+bison --defines=yyparse.h --output=yyparse.cpp parser.y
+g++ -MM -std=gnu++11 astree.cpp lyutils.cpp auxlib.cpp symboltable.cpp stringset.cpp cppstrtok.cpp emit.cpp mangle.cpp yylex.cpp yyparse.cpp >>Makefile.deps
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c astree.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c lyutils.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c auxlib.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c symboltable.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c stringset.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c cppstrtok.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c emit.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c mangle.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c yylex.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -c yyparse.cpp
+g++ -g -O0 -Wall -Wextra -std=gnu++11 -ooc astree.o lyutils.o auxlib.o symboltable.o stringset.o cppstrtok.o emit.o mangle.o yylex.o yyparse.o
+ident astree.o lyutils.o auxlib.o symboltable.o stringset.o cppstrtok.o emit.o mangle.o yylex.o yyparse.o oc >ident.output

@@ -1,0 +1,117 @@
+#include "oclib.oh"
+struct s_node {
+        char** f_node_data;
+        struct s_node** f_node_link;
+};
+struct s_stack {
+        struct s_node** f_stack_top;
+};
+char* c1 = "stack != null";
+char* c2 = "41-linkedstack.oc";
+char* c3 = "stack != null";
+char* c4 = "41-linkedstack.oc";
+char* c5 = "stack != null";
+char* c6 = "41-linkedstack.oc";
+char* c7 = "! empty (stack)";
+char* c8 = "41-linkedstack.oc";
+char** __argv;
+struct s_stack* s_stack;
+int __argi;
+char __empty (
+        struct s_stack* _12_stack)
+{
+        char  c9 = _12_stack != 0;
+        char  c11 = _12_stack != 0;
+        char  c13 = !c11;
+        if(!c13) goto fi_6_15_4;
+        ____assert_fail(c1, c2, 15);
+fi_6_15_4:;
+        struct s_node*  *a16 = &_12_stack->f_stack_top;
+        char  c18 = *a16 == 0;
+return c18;
+};
+struct s_stack* __new_stack ()
+{
+        struct s_stack*  p20 = xcalloc (1, sizeof(struct s_stack));
+        struct s_stack* _14_stack = p20;
+        struct s_node*  *a22 = &_14_stack->f_stack_top;
+        *a22 = null;
+return _14_stack;
+};
+char __push (
+        struct s_stack* _15_stack,
+
+        char* _15_str)
+{
+        char  c24 = _15_stack != 0;
+        char  c26 = _15_stack != 0;
+        char  c28 = !c26;
+        if(!c28) goto fi_6_26_4;
+        ____assert_fail(c3, c4, 26);
+fi_6_26_4:;
+        struct s_node*  p31 = xcalloc (1, sizeof(struct s_node));
+        struct s_node* _15_tmp = p31;
+        char*  *a33 = &_15_tmp->f_node_data;
+        *a33 = _15_str;
+        struct s_node*  *a35 = &_15_tmp->f_node_link;
+        struct s_node*  *a37 = &_15_stack->f_stack_top;
+        *a35 = *a37;
+        struct s_node*  *a39 = &_15_stack->f_stack_top;
+        *a39 = _15_tmp;
+};
+char* __pop (
+        struct s_stack* _17_stack)
+{
+        char  c41 = _17_stack != 0;
+        char  c43 = _17_stack != 0;
+        char  c45 = !c43;
+        if(!c45) goto fi_6_34_4;
+        ____assert_fail(c5, c6, 34);
+fi_6_34_4:;
+        char  c48 = __empty(_17_stack);
+        char  c50 = __empty(_17_stack);
+        char  c52 = !c50;
+        char  c54 = __empty(_17_stack);
+        char  c56 = __empty(_17_stack);
+        char  c58 = !c56;
+        char  c60 = !c58;
+        if(!c60) goto fi_6_35_4;
+        ____assert_fail(c7, c8, 35);
+fi_6_35_4:;
+        struct s_node*  *a63 = &_17_stack->f_stack_top;
+        char*  *a65 = &*a63->f_node_data;
+        char* _17_tmp = *a65;
+        struct s_node*  *a67 = &_17_stack->f_stack_top;
+        struct s_node*  *a69 = &_17_stack->f_stack_top;
+        struct s_node*  *a71 = &*a69->f_node_link;
+        *a67 = *a71;
+return _17_tmp;
+};
+void __ocmain (void) {
+        char**  a73 = __getargv();
+        char** __argv = a73;
+        struct s_stack*  p75 = __new_stack();
+        struct s_stack* s_stack = p75;
+        int __argi = 0;
+while_6_47_0:;
+        char*  *a77 = &__argv[__argi];
+        char  c79 = *a77 != 0;
+        if(!c79) goto break_6_47_0;
+        char*  *a81 = &__argv[__argi];
+        __push(s_stack, *a81);
+        int  i84 = __argi + 1;
+         __argi = i84;
+        goto while_6_47_0;
+break_6_47_0:;
+while_6_52_0:;
+        char  c86 = __empty(s_stack);
+        char  c88 = __empty(s_stack);
+        char  c90 = !c88;
+        if(!c90) goto break_6_52_0;
+        char*  c92 = __pop(s_stack);
+        __puts(c92);
+        __endl();
+        goto while_6_52_0;
+break_6_52_0:;
+return;
+};

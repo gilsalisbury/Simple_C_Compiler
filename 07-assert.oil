@@ -1,0 +1,13 @@
+#include "oclib.oh"
+char* c1 = "null";
+char* c2 = "\"null\" == null";
+char* c3 = "07-assert.oc";
+void __ocmain (void) {
+        char  c4 = c1 == 0;
+        char  c6 = c1 == 0;
+        char  c8 = !c6;
+        if(!c8) goto fi_6_4_1;
+        ____assert_fail(c2, c3, 4);
+fi_6_4_1:;
+return;
+};

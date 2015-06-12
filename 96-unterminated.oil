@@ -1,0 +1,4 @@
+#include "oclib.oh"
+void __ocmain (void) {
+return;
+};

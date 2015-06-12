@@ -1,0 +1,371 @@
+ROOT "" 0:0.000                           
+|  PROTOTYPE "" 5:23.000        
+|  |  VOID "void" 5:23.000  void 
+|  |  |  DECLID "__assert_fail" 5:23.005 void prototype 
+|  |  PARAMLIST "(" 5:23.019         
+|  |  |  STRING "string" 5:23.020 string 
+|  |  |  |  DECLID "expr" 5:23.027 string variable param lval 
+|  |  |  STRING "string" 5:23.033 string 
+|  |  |  |  DECLID "file" 5:23.040 string variable param lval 
+|  |  |  INT "int" 5:23.046   int 
+|  |  |  |  DECLID "line" 5:23.050 int variable param lval 
+|  PROTOTYPE "" 5:24.000        
+|  |  VOID "void" 5:24.000  void 
+|  |  |  DECLID "putb" 5:24.005 void prototype 
+|  |  PARAMLIST "(" 5:24.010       
+|  |  |  BOOL "bool" 5:24.011  bool 
+|  |  |  |  DECLID "b" 5:24.016 bool variable param lval 
+|  PROTOTYPE "" 5:25.000        
+|  |  VOID "void" 5:25.000  void 
+|  |  |  DECLID "putc" 5:25.005 void prototype 
+|  |  PARAMLIST "(" 5:25.010       
+|  |  |  CHAR "char" 5:25.011  char 
+|  |  |  |  DECLID "c" 5:25.016 char variable param lval 
+|  PROTOTYPE "" 5:26.000        
+|  |  VOID "void" 5:26.000  void 
+|  |  |  DECLID "puti" 5:26.005 void prototype 
+|  |  PARAMLIST "(" 5:26.010       
+|  |  |  INT "int" 5:26.011   int 
+|  |  |  |  DECLID "i" 5:26.015 int variable param lval 
+|  PROTOTYPE "" 5:27.000        
+|  |  VOID "void" 5:27.000  void 
+|  |  |  DECLID "puts" 5:27.005 void prototype 
+|  |  PARAMLIST "(" 5:27.010       
+|  |  |  STRING "string" 5:27.011 string 
+|  |  |  |  DECLID "s" 5:27.018 string variable param lval 
+|  PROTOTYPE "" 5:28.000        
+|  |  VOID "void" 5:28.000  void 
+|  |  |  DECLID "endl" 5:28.005 void prototype 
+|  |  PARAMLIST "(" 5:28.010       
+|  PROTOTYPE "" 5:29.000        
+|  |  INT "int" 5:29.000   int 
+|  |  |  DECLID "getc" 5:29.004 int prototype 
+|  |  PARAMLIST "(" 5:29.009       
+|  PROTOTYPE "" 5:30.000        
+|  |  STRING "string" 5:30.000 string 
+|  |  |  DECLID "getw" 5:30.007 string prototype 
+|  |  PARAMLIST "(" 5:30.012       
+|  PROTOTYPE "" 5:31.000        
+|  |  STRING "string" 5:31.000 string 
+|  |  |  DECLID "getln" 5:31.007 string prototype 
+|  |  PARAMLIST "(" 5:31.013       
+|  PROTOTYPE "" 5:32.006        
+|  |  ARRAY "[]" 5:32.006 string array lval vaddr  
+|  |  |  STRING "string" 5:32.000 string 
+|  |  |  DECLID "getargv" 5:32.009 string array vaddr prototype 
+|  |  PARAMLIST "(" 5:32.017       
+|  PROTOTYPE "" 5:33.000        
+|  |  VOID "void" 5:33.000  void 
+|  |  |  DECLID "exit" 5:33.005 void prototype 
+|  |  PARAMLIST "(" 5:33.010       
+|  |  |  INT "int" 5:33.011   int 
+|  |  |  |  DECLID "status" 5:33.015 int variable param lval 
+|  STRUCT "struct" 6:7.000          
+|  |  TYPEID "stack" 6:7.007 struct "stack" 
+|  |  ARRAY "[]" 6:8.009 string array lval vaddr  
+|  |  |  STRING "string" 6:8.003 string 
+|  |  |  FIELD "data" 6:8.012 string array field {stack} 
+|  |  INT "int" 6:9.003   int 
+|  |  |  FIELD "size" 6:9.007 int field {stack} 
+|  |  INT "int" 6:10.003   int 
+|  |  |  FIELD "top" 6:10.007 int field {stack} 
+|  FUNCTION "" 6:13.000         
+|  |  TYPEID "stack" 6:13.000 struct "stack" 
+|  |  |  DECLID "new_stack" 6:13.006 struct "stack" function 
+|  |  PARAMLIST "(" 6:13.016       
+|  |  |  INT "int" 6:13.017   int 
+|  |  |  |  DECLID "size" 6:13.021 int variable param lval 
+|  |  BLOCK "{" 6:13.027           
+|  |  |  VARDECL "=" 6:14.015        
+|  |  |  |  TYPEID "stack" 6:14.003 struct "stack" 
+|  |  |  |  |  DECLID "stack" 6:14.009 struct "stack" variable lval 
+|  |  |  |  TYPEID "stack" 6:14.021 struct "stack" vreg 
+|  |  |  |  |  NEW "new" 6:14.017       
+|  |  |  '=' "=" 6:15.014        
+|  |  |  |  '.' "." 6:15.008 string array field vaddr  
+|  |  |  |  |  IDENT "stack" 6:15.003 struct "stack" variable lval 
+|  |  |  |  |  FIELD "data" 6:15.009 field {stack} 
+|  |  |  |  NEWARRAY "new" 6:15.016 string array vreg  
+|  |  |  |  |  STRING "string" 6:15.020 string 
+|  |  |  |  |  IDENT "size" 6:15.027 int variable param lval 
+|  |  |  '=' "=" 6:16.014        
+|  |  |  |  '.' "." 6:16.008 int field vaddr  
+|  |  |  |  |  IDENT "stack" 6:16.003 struct "stack" variable lval 
+|  |  |  |  |  FIELD "size" 6:16.009 field {stack} 
+|  |  |  |  IDENT "size" 6:16.016 int variable param vreg 
+|  |  |  '=' "=" 6:17.013        
+|  |  |  |  '.' "." 6:17.008 int field vaddr  
+|  |  |  |  |  IDENT "stack" 6:17.003 struct "stack" variable lval 
+|  |  |  |  |  FIELD "top" 6:17.009 field {stack} 
+|  |  |  |  NEG "-" 6:17.016 int vreg 
+|  |  |  |  |  INTCON "1" 6:17.017 int const 
+|  |  |  RETURN "return" 6:18.003 struct "stack" variable lval 
+|  |  |  |  IDENT "stack" 6:18.010 struct "stack" variable lval 
+|  FUNCTION "" 6:21.000         
+|  |  VOID "void" 6:21.000  void 
+|  |  |  DECLID "push" 6:21.005 void function 
+|  |  PARAMLIST "(" 6:21.010        
+|  |  |  TYPEID "stack" 6:21.011 struct "stack" 
+|  |  |  |  DECLID "stack" 6:21.017 struct "stack" variable param lval 
+|  |  |  STRING "string" 6:21.024 string 
+|  |  |  |  DECLID "str" 6:21.031 string variable param lval 
+|  |  BLOCK "{" 6:21.036          
+|  |  |  BLOCK "{" 6:22.003       
+|  |  |  |  IFELSE "if" 6:22.004        
+|  |  |  |  |  '!' "!" 6:22.008 bool vreg 
+|  |  |  |  |  |  LT "<" 6:22.020 bool vreg  
+|  |  |  |  |  |  |  '.' "." 6:22.015 int field vaddr  
+|  |  |  |  |  |  |  |  IDENT "stack" 6:22.010 struct "stack" variable param lval 
+|  |  |  |  |  |  |  |  FIELD "top" 6:22.016 field {stack} 
+|  |  |  |  |  |  |  '-' "-" 6:22.033 int vreg  
+|  |  |  |  |  |  |  |  '.' "." 6:22.027 int field vaddr  
+|  |  |  |  |  |  |  |  |  IDENT "stack" 6:22.022 struct "stack" variable param lval 
+|  |  |  |  |  |  |  |  |  FIELD "size" 6:22.028 field {stack} 
+|  |  |  |  |  |  |  |  INTCON "1" 6:22.035 int const 
+|  |  |  |  |  CALL "(" 6:22.053 void prototype    
+|  |  |  |  |  |  IDENT "__assert_fail" 6:22.039 void prototype 
+|  |  |  |  |  |  STRINGCON ""stack.top < stack.size - 1"" 6:22.054 string const 
+|  |  |  |  |  |  STRINGCON ""40-arraystack.oc"" 6:22.084 string const 
+|  |  |  |  |  |  INTCON "22" 6:22.104 int const 
+|  |  |  ';' ";" 6:22.109       
+|  |  |  '=' "=" 6:23.013        
+|  |  |  |  '.' "." 6:23.008 int field vaddr  
+|  |  |  |  |  IDENT "stack" 6:23.003 struct "stack" variable param lval 
+|  |  |  |  |  FIELD "top" 6:23.009 field {stack} 
+|  |  |  |  '+' "+" 6:23.025 int vreg  
+|  |  |  |  |  '.' "." 6:23.020 int field vaddr  
+|  |  |  |  |  |  IDENT "stack" 6:23.015 struct "stack" variable param lval 
+|  |  |  |  |  |  FIELD "top" 6:23.021 field {stack} 
+|  |  |  |  |  INTCON "1" 6:23.027 int const 
+|  |  |  '=' "=" 6:24.025        
+|  |  |  |  INDEX "[" 6:24.013 string field vreg vaddr  
+|  |  |  |  |  '.' "." 6:24.008 string array field vaddr  
+|  |  |  |  |  |  IDENT "stack" 6:24.003 struct "stack" variable param lval 
+|  |  |  |  |  |  FIELD "data" 6:24.009 field {stack} 
+|  |  |  |  |  '.' "." 6:24.019 int field vaddr  
+|  |  |  |  |  |  IDENT "stack" 6:24.014 struct "stack" variable param lval 
+|  |  |  |  |  |  FIELD "top" 6:24.020 field {stack} 
+|  |  |  |  IDENT "str" 6:24.027 string variable param vreg 
+|  FUNCTION "" 6:27.000         
+|  |  STRING "string" 6:27.000 string 
+|  |  |  DECLID "pop" 6:27.007 string function 
+|  |  PARAMLIST "(" 6:27.011       
+|  |  |  TYPEID "stack" 6:27.012 struct "stack" 
+|  |  |  |  DECLID "stack" 6:27.018 struct "stack" variable param lval 
+|  |  BLOCK "{" 6:27.025           
+|  |  |  BLOCK "{" 6:28.003       
+|  |  |  |  IFELSE "if" 6:28.004        
+|  |  |  |  |  '!' "!" 6:28.008 bool vreg 
+|  |  |  |  |  |  NE "!=" 6:28.020 bool vreg  
+|  |  |  |  |  |  |  '.' "." 6:28.015 int field vaddr  
+|  |  |  |  |  |  |  |  IDENT "stack" 6:28.010 struct "stack" variable param lval 
+|  |  |  |  |  |  |  |  FIELD "top" 6:28.016 field {stack} 
+|  |  |  |  |  |  |  NEG "-" 6:28.024 int vreg 
+|  |  |  |  |  |  |  |  INTCON "1" 6:28.025 int const 
+|  |  |  |  |  CALL "(" 6:28.044 void prototype    
+|  |  |  |  |  |  IDENT "__assert_fail" 6:28.030 void prototype 
+|  |  |  |  |  |  STRINGCON ""stack.top != EMPTY"" 6:28.045 string const 
+|  |  |  |  |  |  STRINGCON ""40-arraystack.oc"" 6:28.067 string const 
+|  |  |  |  |  |  INTCON "28" 6:28.087 int const 
+|  |  |  ';' ";" 6:28.092       
+|  |  |  VARDECL "=" 6:29.014        
+|  |  |  |  STRING "string" 6:29.003 string lval 
+|  |  |  |  |  DECLID "tmp" 6:29.010 string variable lval 
+|  |  |  |  INDEX "[" 6:29.026 string field vreg vaddr  
+|  |  |  |  |  '.' "." 6:29.021 string array field vaddr  
+|  |  |  |  |  |  IDENT "stack" 6:29.016 struct "stack" variable param lval 
+|  |  |  |  |  |  FIELD "data" 6:29.022 field {stack} 
+|  |  |  |  |  '.' "." 6:29.032 int field vaddr  
+|  |  |  |  |  |  IDENT "stack" 6:29.027 struct "stack" variable param lval 
+|  |  |  |  |  |  FIELD "top" 6:29.033 field {stack} 
+|  |  |  '=' "=" 6:30.013        
+|  |  |  |  '.' "." 6:30.008 int field vaddr  
+|  |  |  |  |  IDENT "stack" 6:30.003 struct "stack" variable param lval 
+|  |  |  |  |  FIELD "top" 6:30.009 field {stack} 
+|  |  |  |  '-' "-" 6:30.025 int vreg  
+|  |  |  |  |  '.' "." 6:30.020 int field vaddr  
+|  |  |  |  |  |  IDENT "stack" 6:30.015 struct "stack" variable param lval 
+|  |  |  |  |  |  FIELD "top" 6:30.021 field {stack} 
+|  |  |  |  |  INTCON "1" 6:30.027 int const 
+|  |  |  RETURN "return" 6:31.003 string variable lval 
+|  |  |  |  IDENT "tmp" 6:31.010 string variable lval 
+|  FUNCTION "" 6:34.000         
+|  |  BOOL "bool" 6:34.000  bool 
+|  |  |  DECLID "empty" 6:34.005 bool function 
+|  |  PARAMLIST "(" 6:34.011       
+|  |  |  TYPEID "stack" 6:34.012 struct "stack" 
+|  |  |  |  DECLID "stack" 6:34.018 struct "stack" variable param lval 
+|  |  BLOCK "{" 6:34.025       
+|  |  |  RETURN "return" 6:35.003 bool vreg 
+|  |  |  |  EQ "==" 6:35.020 bool vreg  
+|  |  |  |  |  '.' "." 6:35.015 int field vaddr  
+|  |  |  |  |  |  IDENT "stack" 6:35.010 struct "stack" variable param lval 
+|  |  |  |  |  |  FIELD "top" 6:35.016 field {stack} 
+|  |  |  |  |  NEG "-" 6:35.024 int vreg 
+|  |  |  |  |  |  INTCON "1" 6:35.025 int const 
+|  VARDECL "=" 6:39.014        
+|  |  ARRAY "[]" 6:39.006 string array lval vaddr  
+|  |  |  STRING "string" 6:39.000 string 
+|  |  |  DECLID "argv" 6:39.009 string array variable lval 
+|  |  CALL "(" 6:39.024 string array vreg vaddr prototype 
+|  |  |  IDENT "getargv" 6:39.016 string array vaddr prototype 
+|  VARDECL "=" 6:40.012        
+|  |  TYPEID "stack" 6:40.000 struct "stack" 
+|  |  |  DECLID "stack" 6:40.006 struct "stack" variable lval 
+|  |  CALL "(" 6:40.024 struct "stack"  
+|  |  |  IDENT "new_stack" 6:40.014 struct "stack" function 
+|  |  |  INTCON "100" 6:40.025 int const 
+|  VARDECL "=" 6:42.009        
+|  |  INT "int" 6:42.000 int lval 
+|  |  |  DECLID "argi" 6:42.004 int variable lval 
+|  |  INTCON "0" 6:42.011 int const vreg 
+|  WHILE "while" 6:43.000        
+|  |  NE "!=" 6:43.018 bool vreg  
+|  |  |  INDEX "[" 6:43.011 string vreg vaddr  
+|  |  |  |  IDENT "argv" 6:43.007 string array variable lval 
+|  |  |  |  IDENT "argi" 6:43.012 int variable lval 
+|  |  |  NULL "null" 6:43.021  null 
+|  |  BLOCK "{" 6:43.027        
+|  |  |  CALL "(" 6:44.008  void   
+|  |  |  |  IDENT "push" 6:44.003 void function 
+|  |  |  |  IDENT "stack" 6:44.009 struct "stack" variable lval 
+|  |  |  |  INDEX "[" 6:44.020 string vreg vaddr  
+|  |  |  |  |  IDENT "argv" 6:44.016 string array variable lval 
+|  |  |  |  |  IDENT "argi" 6:44.021 int variable lval 
+|  |  |  '=' "=" 6:45.008        
+|  |  |  |  IDENT "argi" 6:45.003 int variable lval 
+|  |  |  |  '+' "+" 6:45.015 int vreg  
+|  |  |  |  |  IDENT "argi" 6:45.010 int variable lval 
+|  |  |  |  |  INTCON "1" 6:45.017 int const 
+|  WHILE "while" 6:48.000        
+|  |  '!' "!" 6:48.007 bool vreg 
+|  |  |  CALL "(" 6:48.015  bool  
+|  |  |  |  IDENT "empty" 6:48.009 bool function 
+|  |  |  |  IDENT "stack" 6:48.016 struct "stack" variable lval 
+|  |  BLOCK "{" 6:48.024        
+|  |  |  CALL "(" 6:49.008 void prototype  
+|  |  |  |  IDENT "puts" 6:49.003 void prototype 
+|  |  |  |  CALL "(" 6:49.013 string  
+|  |  |  |  |  IDENT "pop" 6:49.009 string function 
+|  |  |  |  |  IDENT "stack" 6:49.014 struct "stack" variable lval 
+|  |  |  CALL "(" 6:50.008 void prototype 
+|  |  |  |  IDENT "endl" 6:50.003 void prototype 
+
+
+type_reg is = char** 
+struct s_stack {
+        char*** f_stack_data;
+        int* f_stack_size;
+        int* f_stack_top;
+};
+char* c1 = "stack.top < stack.size - 1";
+char* c2 = "40-arraystack.oc";
+char* c3 = "stack.top != EMPTY";
+char* c4 = "40-arraystack.oc";
+char** __argv;
+struct s_stack* s_stack;
+int __argi;
+struct s_stack* __new_stack (
+        int _12_size)
+{
+        struct s_stack*  p5 = xcalloc (1, sizeof(struct s_stack));
+        struct s_stack* _12_stack = p5;
+        char**  *a7 = &_12_stack->f_stack_data;
+        char**  c9 = xcalloc (_12_size, sizeof(char*));
+        *a7 = c9;
+        int  *a13 = &_12_stack->f_stack_size;
+        *a13 = _12_size;
+        int  *a15 = &_12_stack->f_stack_top;
+        int  i17 = -1;
+        *a15 = i17;
+return _12_stack;
+};
+char __push (
+        struct s_stack* _13_stack,
+
+        char* _13_str)
+{
+        int  *a19 = &_13_stack->f_stack_top;
+        int  *a21 = &_13_stack->f_stack_size;
+        int  i23 = *a21 - 1;
+        char  c25 = *a19 < i23;
+        int  *a27 = &_13_stack->f_stack_top;
+        int  *a29 = &_13_stack->f_stack_size;
+        int  i31 = *a29 - 1;
+        char  c33 = *a27 < i31;
+        char  c35 = !c33;
+        if(!c35) goto fi_6_22_4;
+        ____assert_fail(c1, c2, 22);
+fi_6_22_4:;
+        int  *a38 = &_13_stack->f_stack_top;
+        int  *a40 = &_13_stack->f_stack_top;
+        int  i42 = *a40 + 1;
+        *a38 = i42;
+        char**  *a44 = &_13_stack->f_stack_data;
+        int  *a46 = &_13_stack->f_stack_top;
+        int  *a48 = &_13_stack->f_stack_top;
+        char**  *a50 = &_13_stack->f_stack_data;
+        char*  *a52 = &*a50[*a48];
+        *a52 = _13_str;
+};
+char* __pop (
+        struct s_stack* _15_stack)
+{
+        int  *a54 = &_15_stack->f_stack_top;
+        int  i56 = -1;
+        char  c58 = *a54 != i56;
+        int  *a60 = &_15_stack->f_stack_top;
+        int  i62 = -1;
+        char  c64 = *a60 != i62;
+        char  c66 = !c64;
+        if(!c66) goto fi_6_28_4;
+        ____assert_fail(c3, c4, 28);
+fi_6_28_4:;
+        char**  *a69 = &_15_stack->f_stack_data;
+        int  *a71 = &_15_stack->f_stack_top;
+        int  *a73 = &_15_stack->f_stack_top;
+        char**  *a75 = &_15_stack->f_stack_data;
+        char*  *a77 = &*a75[*a73];
+        char* _15_tmp = *a77;
+        int  *a79 = &_15_stack->f_stack_top;
+        int  *a81 = &_15_stack->f_stack_top;
+        int  i83 = *a81 - 1;
+        *a79 = i83;
+return _15_tmp;
+};
+char __empty (
+        struct s_stack* _17_stack)
+{
+        int  *a85 = &_17_stack->f_stack_top;
+        int  i87 = -1;
+        char  c89 = *a85 == i87;
+return c89;
+};
+void __ocmain (void) {
+        char**  a91 = __getargv();
+        char** __argv = a91;
+        struct s_stack*  p93 = __new_stack(100);
+        struct s_stack* s_stack = p93;
+        int __argi = 0;
+while_6_43_0:;
+        char*  *a95 = &__argv[__argi];
+        char  c97 = *a95 != 0;
+        if(!c97) goto break_6_43_0;
+        char*  *a99 = &__argv[__argi];
+        __push(s_stack, *a99);
+        int  i102 = __argi + 1;
+         __argi = i102;
+        goto while_6_43_0;
+break_6_43_0:;
+while_6_48_0:;
+        char  c104 = __empty(s_stack);
+        char  c106 = __empty(s_stack);
+        char  c108 = !c106;
+        if(!c108) goto break_6_48_0;
+        char*  c110 = __pop(s_stack);
+        __puts(c110);
+        __endl();
+        goto while_6_48_0;
+break_6_48_0:;
+return;
+};

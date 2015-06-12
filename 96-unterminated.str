@@ -1,0 +1,8 @@
+stringset[   1]:   11597697714117577063: 0x206e758->"="
+stringset[   4]:    5344662657899890615: 0x206e818->";"
+stringset[   5]:   13497578857207247412: 0x206e4a8->"string"
+stringset[   6]:    6142509188972423790: 0x206a428->""
+stringset[  10]:     831242270113464010: 0x206e678->"t"
+load_factor = 0.455
+bucket_count = 11
+max_bucket_size = 1

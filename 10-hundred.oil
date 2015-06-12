@@ -1,0 +1,15 @@
+#include "oclib.oh"
+int __count;
+void __ocmain (void) {
+        int __count = 0;
+while_6_6_0:;
+        char  c1 = __count <= 100;
+        if(!c1) goto break_6_6_0;
+        int  i3 = __count + 1;
+         __count = i3;
+        __puti(__count);
+        __endl();
+        goto while_6_6_0;
+break_6_6_0:;
+return;
+};

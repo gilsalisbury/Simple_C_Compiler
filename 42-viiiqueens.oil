@@ -1,0 +1,88 @@
+#include "oclib.oh"
+int* __board;
+char __is_safe (
+        int _12_newcol)
+{
+        int _12_col = 0;
+while_6_10_3:;
+        char  c1 = _12_col < _12_newcol;
+        if(!c1) goto break_6_10_3;
+        int  *a3 = &__board[_12_col];
+        int  *a5 = &__board[_12_newcol];
+        char  c7 = *a3 == *a5;
+        if(!c7) goto fi_6_11_6;
+        char c9 =  0;
+return c9;
+fi_6_11_6:;
+        int  *a11 = &__board[_12_col];
+        int  *a13 = &__board[_12_newcol];
+        int  i15 = *a11 - *a13;
+        int _13_diagonal = i15;
+        int  i17 = _12_col - _12_newcol;
+        char  c19 = _13_diagonal == i17;
+        if(!c19) goto fi_6_13_6;
+        char c21 =  0;
+return c21;
+fi_6_13_6:;
+        int  i23 = _12_newcol - _12_col;
+        char  c25 = _13_diagonal == i23;
+        if(!c25) goto fi_6_14_6;
+        char c27 =  0;
+return c27;
+fi_6_14_6:;
+        int  i29 = _12_col + 1;
+         _12_col = i29;
+        goto while_6_10_3;
+break_6_10_3:;
+        char c31 =  1;
+return c31;
+};
+char __printqueens ()
+{
+        int _14_col = 0;
+while_6_22_3:;
+        char  c33 = _14_col < 8;
+        if(!c33) goto break_6_22_3;
+        int  *a35 = &__board[_14_col];
+        int  i37 = (int)'1';
+        char  c39 = *a35 + i37;
+        char  c41 = (char)c39;
+        __putc(c41);
+        int  i44 = _14_col + 1;
+         _14_col = i44;
+        goto while_6_22_3;
+break_6_22_3:;
+        __putc('\n');
+};
+char __queens (
+        int _16_newcol)
+{
+        char  c47 = _16_newcol == 8;
+if(!c47) goto else_6_30_3;
+        __printqueens();
+        goto fi_6_30_3;
+else_6_30_3:;
+        int _17_row = 0;
+while_6_33_6:;
+        char  c50 = _17_row < 8;
+        if(!c50) goto break_6_33_6;
+        int  *a52 = &__board[_16_newcol];
+        *a52 = _17_row;
+        char  c54 = __is_safe(_16_newcol);
+        if(!c54) goto fi_6_35_9;
+        int  i56 = _16_newcol + 1;
+        int  i58 = _16_newcol + 1;
+        char  c60 = __queens(i58);
+fi_6_35_9:;
+        int  i62 = _17_row + 1;
+         _17_row = i62;
+        goto while_6_33_6;
+break_6_33_6:;
+fi_6_30_3:;
+};
+void __ocmain (void) {
+        int*  i64 = xcalloc (8, sizeof(int));
+        int* __board = i64;
+        __queens(0);
+return;
+};

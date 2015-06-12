@@ -1,0 +1,42 @@
+#include "oclib.oh"
+char* c1 = "Move a disk from ";
+char* c2 = " to ";
+char* c3 = ".\n";
+char* c4 = "Source";
+char* c5 = "Temporary";
+char* c6 = "Destination";
+char __move (
+        char* _12_src,
+
+        char* _12_dst)
+{
+        __puts(c1);
+        __puts(_12_src);
+        __puts(c2);
+        __puts(_12_dst);
+        __puts(c3);
+};
+char __towers (
+        int _13_ndisks,
+
+        char* _13_src,
+
+        char* _13_tmp,
+
+        char* _13_dst)
+{
+        char  c12 = _13_ndisks < 1;
+        if(!c12) goto fi_6_14_3;
+
+return;
+fi_6_14_3:;
+        int  i14 = _13_ndisks - 1;
+        char  c16 = __towers(i14, _13_src, _13_dst, _13_tmp);
+        __move(_13_src, _13_dst);
+        int  i19 = _13_ndisks - 1;
+        char  c21 = __towers(i19, _13_tmp, _13_src, _13_dst);
+};
+void __ocmain (void) {
+        __towers(4, c4, c5, c6);
+return;
+};

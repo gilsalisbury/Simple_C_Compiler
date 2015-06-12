@@ -1,0 +1,143 @@
+ROOT "" 0:0.000                    
+|  PROTOTYPE "" 5:23.000        
+|  |  VOID "void" 5:23.000  void 
+|  |  |  DECLID "__assert_fail" 5:23.005 void prototype 
+|  |  PARAMLIST "(" 5:23.019         
+|  |  |  STRING "string" 5:23.020 string 
+|  |  |  |  DECLID "expr" 5:23.027 string variable param lval 
+|  |  |  STRING "string" 5:23.033 string 
+|  |  |  |  DECLID "file" 5:23.040 string variable param lval 
+|  |  |  INT "int" 5:23.046   int 
+|  |  |  |  DECLID "line" 5:23.050 int variable param lval 
+|  PROTOTYPE "" 5:24.000        
+|  |  VOID "void" 5:24.000  void 
+|  |  |  DECLID "putb" 5:24.005 void prototype 
+|  |  PARAMLIST "(" 5:24.010       
+|  |  |  BOOL "bool" 5:24.011  bool 
+|  |  |  |  DECLID "b" 5:24.016 bool variable param lval 
+|  PROTOTYPE "" 5:25.000        
+|  |  VOID "void" 5:25.000  void 
+|  |  |  DECLID "putc" 5:25.005 void prototype 
+|  |  PARAMLIST "(" 5:25.010       
+|  |  |  CHAR "char" 5:25.011  char 
+|  |  |  |  DECLID "c" 5:25.016 char variable param lval 
+|  PROTOTYPE "" 5:26.000        
+|  |  VOID "void" 5:26.000  void 
+|  |  |  DECLID "puti" 5:26.005 void prototype 
+|  |  PARAMLIST "(" 5:26.010       
+|  |  |  INT "int" 5:26.011   int 
+|  |  |  |  DECLID "i" 5:26.015 int variable param lval 
+|  PROTOTYPE "" 5:27.000        
+|  |  VOID "void" 5:27.000  void 
+|  |  |  DECLID "puts" 5:27.005 void prototype 
+|  |  PARAMLIST "(" 5:27.010       
+|  |  |  STRING "string" 5:27.011 string 
+|  |  |  |  DECLID "s" 5:27.018 string variable param lval 
+|  PROTOTYPE "" 5:28.000        
+|  |  VOID "void" 5:28.000  void 
+|  |  |  DECLID "endl" 5:28.005 void prototype 
+|  |  PARAMLIST "(" 5:28.010       
+|  PROTOTYPE "" 5:29.000        
+|  |  INT "int" 5:29.000   int 
+|  |  |  DECLID "getc" 5:29.004 int prototype 
+|  |  PARAMLIST "(" 5:29.009       
+|  PROTOTYPE "" 5:30.000        
+|  |  STRING "string" 5:30.000 string 
+|  |  |  DECLID "getw" 5:30.007 string prototype 
+|  |  PARAMLIST "(" 5:30.012       
+|  PROTOTYPE "" 5:31.000        
+|  |  STRING "string" 5:31.000 string 
+|  |  |  DECLID "getln" 5:31.007 string prototype 
+|  |  PARAMLIST "(" 5:31.013       
+|  PROTOTYPE "" 5:32.006        
+|  |  ARRAY "[]" 5:32.006 string array lval vaddr  
+|  |  |  STRING "string" 5:32.000 string 
+|  |  |  DECLID "getargv" 5:32.009 string array vaddr prototype 
+|  |  PARAMLIST "(" 5:32.017       
+|  PROTOTYPE "" 5:33.000        
+|  |  VOID "void" 5:33.000  void 
+|  |  |  DECLID "exit" 5:33.005 void prototype 
+|  |  PARAMLIST "(" 5:33.010       
+|  |  |  INT "int" 5:33.011   int 
+|  |  |  |  DECLID "status" 5:33.015 int variable param lval 
+|  FUNCTION "" 6:8.000         
+|  |  INT "int" 6:8.000   int 
+|  |  |  DECLID "fac" 6:8.004 int function 
+|  |  PARAMLIST "(" 6:8.008       
+|  |  |  INT "int" 6:8.009   int 
+|  |  |  |  DECLID "n" 6:8.013 int variable param lval 
+|  |  BLOCK "{" 6:8.016         
+|  |  |  VARDECL "=" 6:9.009        
+|  |  |  |  INT "int" 6:9.003 int lval 
+|  |  |  |  |  DECLID "f" 6:9.007 int variable lval 
+|  |  |  |  INTCON "1" 6:9.011 int const vreg 
+|  |  |  WHILE "while" 6:10.003        
+|  |  |  |  GT ">" 6:10.012 bool vreg  
+|  |  |  |  |  IDENT "n" 6:10.010 int variable param lval 
+|  |  |  |  |  INTCON "1" 6:10.014 int const 
+|  |  |  |  BLOCK "{" 6:10.017        
+|  |  |  |  |  '=' "=" 6:11.008        
+|  |  |  |  |  |  IDENT "f" 6:11.006 int variable lval 
+|  |  |  |  |  |  '*' "*" 6:11.012 int vreg  
+|  |  |  |  |  |  |  IDENT "f" 6:11.010 int variable lval 
+|  |  |  |  |  |  |  IDENT "n" 6:11.014 int variable param lval 
+|  |  |  |  |  '=' "=" 6:12.008        
+|  |  |  |  |  |  IDENT "n" 6:12.006 int variable param lval 
+|  |  |  |  |  |  '-' "-" 6:12.012 int vreg  
+|  |  |  |  |  |  |  IDENT "n" 6:12.010 int variable param lval 
+|  |  |  |  |  |  |  INTCON "1" 6:12.014 int const 
+|  |  |  RETURN "return" 6:14.003 int variable lval 
+|  |  |  |  IDENT "f" 6:14.010 int variable lval 
+|  VARDECL "=" 6:17.006        
+|  |  INT "int" 6:17.000 int lval 
+|  |  |  DECLID "n" 6:17.004 int variable lval 
+|  |  INTCON "1" 6:17.008 int const vreg 
+|  WHILE "while" 6:18.000        
+|  |  LE "<=" 6:18.009 bool vreg  
+|  |  |  IDENT "n" 6:18.007 int variable lval 
+|  |  |  INTCON "5" 6:18.012 int const 
+|  |  BLOCK "{" 6:18.015         
+|  |  |  CALL "(" 6:19.008 void prototype  
+|  |  |  |  IDENT "puti" 6:19.003 void prototype 
+|  |  |  |  CALL "(" 6:19.013   int  
+|  |  |  |  |  IDENT "fac" 6:19.009 int function 
+|  |  |  |  |  IDENT "n" 6:19.014 int variable lval 
+|  |  |  CALL "(" 6:20.008 void prototype 
+|  |  |  |  IDENT "endl" 6:20.003 void prototype 
+|  |  |  '=' "=" 6:21.005        
+|  |  |  |  IDENT "n" 6:21.003 int variable lval 
+|  |  |  |  '+' "+" 6:21.009 int vreg  
+|  |  |  |  |  IDENT "n" 6:21.007 int variable lval 
+|  |  |  |  |  INTCON "1" 6:21.011 int const 
+
+
+int __n;
+int __fac (
+        int _12_n)
+{
+        int _12_f = 1;
+while_6_10_3:;
+        char  c1 = _12_n > 1;
+        if(!c1) goto break_6_10_3;
+        int  i3 = _12_f * _12_n;
+         _12_f = i3;
+        int  i5 = _12_n - 1;
+         _12_n = i5;
+        goto while_6_10_3;
+break_6_10_3:;
+return _12_f;
+};
+void __ocmain (void) {
+        int __n = 1;
+while_6_18_0:;
+        char  c7 = __n <= 5;
+        if(!c7) goto break_6_18_0;
+        int  i9 = __fac(__n);
+        __puti(i9);
+        __endl();
+        int  i13 = __n + 1;
+         __n = i13;
+        goto while_6_18_0;
+break_6_18_0:;
+return;
+};

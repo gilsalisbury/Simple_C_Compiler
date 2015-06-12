@@ -1,0 +1,30 @@
+#include "oclib.oh"
+char* c1 = "one";
+char* c2 = "two";
+char* c3 = "three";
+char* c4 = "many";
+int __a;
+void __ocmain (void) {
+        int __a = 3;
+        char  c5 = __a == 1;
+if(!c5) goto else_6_7_0;
+        __puts(c1);
+        goto fi_6_7_0;
+else_6_7_0:;
+        char  c8 = __a == 2;
+if(!c8) goto else_6_8_5;
+        __puts(c2);
+        goto fi_6_8_5;
+else_6_8_5:;
+        char  c11 = __a == 3;
+if(!c11) goto else_6_9_5;
+        __puts(c3);
+        goto fi_6_9_5;
+else_6_9_5:;
+        __puts(c4);
+fi_6_9_5:;
+fi_6_8_5:;
+fi_6_7_0:;
+        __endl();
+return;
+};

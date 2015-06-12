@@ -1,0 +1,31 @@
+__assert_fail (5:23.5) {0} void prototype 
+  expr (5:23.27) {1} string variable param lval 
+  file (5:23.40) {1} string variable param lval 
+  line (5:23.50) {1} int variable param lval 
+putb (5:24.5) {0} void prototype 
+  b (5:24.16) {2} bool variable param lval 
+putc (5:25.5) {0} void prototype 
+  c (5:25.16) {3} char variable param lval 
+puti (5:26.5) {0} void prototype 
+  i (5:26.15) {4} int variable param lval 
+puts (5:27.5) {0} void prototype 
+  s (5:27.18) {5} string variable param lval 
+endl (5:28.5) {0} void prototype 
+getc (5:29.4) {0} int prototype 
+getw (5:30.7) {0} string prototype 
+getln (5:31.7) {0} string prototype 
+getargv (5:32.9) {0} string array vaddr prototype 
+exit (5:33.5) {0} void prototype 
+  status (5:33.15) {11} int variable param lval 
+dot_product (6:5.4) {0} int function 
+  size (6:5.21) {12} int variable param lval 
+  vec1 (6:5.33) {12} int array variable param lval vaddr 
+  vec2 (6:5.45) {12} int array variable param lval vaddr 
+  index (6:6.7) {12} int variable lval 
+  dot (6:7.7) {12} int variable lval 
+
+vec1 (6:16.6) {0} int array variable lval 
+
+vec2 (6:17.6) {0} int array variable lval 
+
+i (6:18.4) {0} int variable lval 
