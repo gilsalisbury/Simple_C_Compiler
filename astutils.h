@@ -1,4 +1,4 @@
-
+ 
 
 typedef void (*func) (int root);
 void vardecl_type(int root);
