@@ -603,8 +603,8 @@ void emit_prefix (FILE* outfile) {
    fprintf(outfile, var_prefix->c_str());
    fprintf(outfile, func_prefix->c_str());
 
-   cout << struct_prefix->c_str() << strcon_prefix->c_str() <<
-      var_prefix->c_str() << func_prefix->c_str();
+   //cout << struct_prefix->c_str() << strcon_prefix->c_str() <<
+   //   var_prefix->c_str() << func_prefix->c_str();
 }
 
 
@@ -616,7 +616,7 @@ void emit_main (astree* root, FILE* outfile) {
    *current_string += "return;\n};\n";
    fprintf(outfile, main_string->c_str());
    
-   cout << main_string->c_str();
+   //cout << main_string->c_str();
 }
 
 
