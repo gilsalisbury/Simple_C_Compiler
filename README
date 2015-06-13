@@ -1,23 +1,45 @@
-Donald Salisbury 
-dsalibu 
-1224878
-partner: none
+Donald Salisbury
+I wrote this compiler over the course of 10 weeks in Mackey's Compiler design 
+class at UCSC and recieved a grade of A+.  That being said you still may find 
+a bug or two in this compiler.  I am fixing these as I find them.  
 
-CMPS104a Spring 2015
 
-Assignmnet 5:
+Simple C-Like Compiler
 
-This assignment generates oil code.
+This program defines a compiler for a simple C like language OC, written 
+by Dr. Wesley Mackey at UCSC. 
 
-Oil code compiles and runs for some programs, but fails due
-to some pointer assignments and some cases of nested if elses
-among others...
+USAGE:
 
-This program should take any .oc file as input and output 
-five files:
+input: oc program.oc
+outputs: 
 
-program.str
-program.tok
-program.ast
-program.sym
-program.oil
+    Executable binary:  program
+
+    Five intermediate files involed in compilation (can be ignored)
+        program.str
+        program.tok
+        program.ast
+        program.sym
+        program.oil
+
+
+OC LANGUAGE:
+
+syntax:  OC follows C-like syntax, for examples see .oc files included in directory.
+
+Note that the line '#include "oclib.oh"' should be 
+included in every oc program to use the built in library.
+
+    void __assert_fail (string expr, string file, int line);
+    void putb (bool b);
+    void putc (char c);
+    void puti (int i);
+    void puts (string s);
+    void endl ();
+    int getc ();
+    string getw ();
+    string getln ();
+    string[] getargv ();
+    void exit (int status);
+
