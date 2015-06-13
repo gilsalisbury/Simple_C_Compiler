@@ -12,7 +12,7 @@ using string_stack = vector<astree*>;
 
 int address = 1;
 
-string_stack* strings =  new string_stack();
+
 string* struct_prefix = new string();
 string* strcon_prefix = new string();
 string* var_prefix = new string();
@@ -603,8 +603,8 @@ void emit_prefix (FILE* outfile) {
    fprintf(outfile, var_prefix->c_str());
    fprintf(outfile, func_prefix->c_str());
 
-   //cout << struct_prefix->c_str() << strcon_prefix->c_str() <<
-   //   var_prefix->c_str() << func_prefix->c_str();
+   cout << struct_prefix->c_str() << strcon_prefix->c_str() <<
+      var_prefix->c_str() << func_prefix->c_str();
 }
 
 
@@ -616,7 +616,7 @@ void emit_main (astree* root, FILE* outfile) {
    *current_string += "return;\n};\n";
    fprintf(outfile, main_string->c_str());
    
-   //cout << main_string->c_str();
+   cout << main_string->c_str();
 }
 
 
@@ -661,7 +661,14 @@ void emit_ta_code (FILE* outfile, astree* root) {
    if (root == NULL) return;
    preorder(root);
    emit_prefix(outfile);
-   emit_main(root, outfile); 
+   emit_main(root, outfile);
+   free (struct_prefix);
+   free (func_prefix);
+   free (var_prefix);
+   free (strcon_prefix);
+   free (main_string);
+   free_syms();
+
 }
 
 RCSC("$Id: emit.cc,v 1.3 2013-09-20 17:52:13-07 - - $")

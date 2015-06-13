@@ -18,13 +18,13 @@ stack new_stack (int size) {
 }
 
 void push (stack stack, string str) {
-   //assert (stack.top < stack.size - 1);
+   assert (stack.top < stack.size - 1);
    stack.top = stack.top + 1;
    stack.data[stack.top] = str;
 }
 
 string pop (stack stack) {
-   //assert (stack.top != EMPTY);
+   assert (stack.top != EMPTY);
    string tmp = stack.data[stack.top];
    stack.top = stack.top - 1;
    return tmp;
@@ -35,12 +35,16 @@ bool empty (stack stack) {
 }
 
 // Main program.
+puts ("before getargv");
 string[] argv = getargv ();
+puts ("after getargv");
 stack stack = new_stack (100);
 
 int argi = 0;
 while (argv[argi] != null) {
+   puts ("before push");
    push (stack, argv[argi]);
+   puts (argv[argi]);
    argi = argi + 1;
 }
 

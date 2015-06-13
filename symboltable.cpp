@@ -23,12 +23,28 @@ symbol_stack* struct_stack = new symbol_stack();
 vector<string> included_filenames;
 bool struct_block = false;
 
+
+
 symbol::symbol ( size_t filenr, size_t linenr, size_t offset,
         size_t blocknr ) :
         filenr (filenr), linenr (linenr), offset (offset),
         blocknr (blocknr) {
     DEBUGF ('f', "symbol %p->{%d:%d.%d: }\n",
         (void*) this, filenr, linenr, offset);
+}
+
+
+
+void free_syms () {
+    block_count->clear();
+    free (block_count);
+    gc->clear();
+    free (gc);
+    stack->clear();
+    free (stack);
+    struct_stack->clear();
+    free (struct_stack);
+
 }
 
 void init_symbol_table () {
