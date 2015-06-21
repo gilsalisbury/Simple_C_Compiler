@@ -135,8 +135,8 @@ int main (int argc, char** argv) {
             stringout.open(strfn, ostream::out);
             dump_stringset(stringout);
             type_ast(symout, yyparse_astree);
-            dump_astree(stdout, yyparse_astree);
-            cout << endl << endl;
+            dump_astree(astout, yyparse_astree);
+           
 
             emit_ta_code(oilout, yyparse_astree);
             fflush(NULL);
